@@ -1,0 +1,11 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "../../pypetting_extra"
+		}
+	],
+	"settings": {}
+}

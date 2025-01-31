@@ -1,0 +1,49 @@
+from pypetting_extra import Experiment
+from configurations import AssayConfiguration
+from setup_pdcurve import pdSetup
+from workflow_pdcurve import pdWorkflow
+from general_classes import PathManager
+import pandas as pd
+import numpy as np
+
+## use pyenv 3.12.0
+
+folder = "twofold1:1"
+exp_name = "0_0125_32_05022025"
+exp_path = "/Users/malte/polybox/Shared/Robot-Malte/CombinationProject/" + folder
+
+## The order of the plates array defines the order in which the plates are created.
+# This is important, low concentrations should be first, because the same tips are used.
+plates = ["antibiotic8", "antibiotic16"]
+# the read order defines the order in which the plates are read.
+# Plates may appear multiple times in the read order, but only once in the plates array.
+read_order = [
+    "assay16",
+    "assay8",
+]
+
+
+pm = PathManager(basepath="current")
+drugs = pd.read_excel(pm.file_path("drugs.xlsx", folder="notes"))
+
+experiment = Experiment(
+    exp_name,
+    exp_path,
+    "C:\\Users\\COMPUTER\\polybox\\Robot-Malte\\CombinationProject\\" + folder,
+)
+
+config = AssayConfiguration()
+setup = pdSetup(config, experiment, plates)
+
+workflow = pdWorkflow(setup)
+workflow.grow_overnight()
+workflow.prepare_exp_cultures()
+workflow.treat_cultures()
+workflow.luminescence_read_loop(read_order)
+
+## EVOSCRIPT
+# WL-Grow Overnight
+# WL-Prepare exponential cultures
+# WL-Treat cultures
+# for i:
+#     WL-Lumread plate i
