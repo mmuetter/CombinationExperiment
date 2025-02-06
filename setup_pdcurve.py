@@ -21,7 +21,6 @@ roma = worktable.roma
 tilter = worktable.tilter
 lid1_pos = worktable.carrier["MP 2Pos Fixed"].gridsite(0)
 lid2_pos = worktable.carrier["MP 2Pos Fixed"].gridsite(1)
-lid3_pos = shelf.gridsite(30)
 rotated_site = tilter.gridsite(0)
 plate1_pos = worktable.carrier["MP 3Pos Fixed"].gridsite(0)
 plate2_pos = worktable.carrier["MP 3Pos Fixed"].gridsite(1)
@@ -29,7 +28,7 @@ plate3_pos = worktable.carrier["MP 3Pos Fixed"].gridsite(2)
 corning_8row = Labware("8 Row DeepWell Corning", 8, 1)
 greiner96 = labwares["greiner96"]
 greiner384 = labwares["greiner384"]
-dw12col = Labware("12Col Through", 1, 12)
+dw12col = Labware("12Col Through", 8, 12)
 
 
 class pdSetup:
@@ -59,8 +58,8 @@ class pdSetup:
         self.medium_trough = self.define_medium_trough()
         self.assayplates = self.define_assay_plate(self.assay_plate_names)
         self.antibiotic_plates = self.define_antibiotic_plates(antibiotic_plate_names)
-
         self.assay_dict = dict(zip(self.assay_plate_names, self.assayplates))
+        experiment.save_csv(self.storex_locations(), "storex_locations.csv")
 
     def define_overnight_plate(
         self,
@@ -86,7 +85,8 @@ class pdSetup:
     def define_antibiotic_plates(self, plate_names):
         plates = []
         for i, name in enumerate(plate_names):
-            plate = shelf.define_plate(name, greiner96, 0, 31 - i)
+            print(i, name)
+            plate = shelf.define_plate(name, greiner96, 31 - i, is_store_pos=True)
             self.location.add(plate)
             plates.append(plate)
         return plates
@@ -101,4 +101,4 @@ class pdSetup:
         return plates
 
     def storex_locations(self):
-        return storex.locations
+        return storex.locations()

@@ -10,7 +10,7 @@ from functions import layout_antibiotic_plate
 ## use pyenv 3.12.0
 
 folder = "twofold1to1"
-exp_name = "prep_plates_04022025"
+exp_name = "prep_plates_06022025"
 exp_path = "/Users/malte/polybox/Shared/Robot-Malte/CombinationProject/" + folder
 
 pm = PathManager(basepath="current")

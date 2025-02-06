@@ -112,7 +112,7 @@ class PrepWorkflow:
             )
         )
         wl.add(roma.store(plate))
-        wl.add(liha.sterile_wash())
+        wl.add(liha.sterile_wash(), msg=f"plate_{label}_done")
 
     def setup_worklist(self, name):
         return self.experiment.setup_worklist(name, protocol=self.protocol)

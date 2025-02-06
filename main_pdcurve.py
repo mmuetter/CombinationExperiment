@@ -8,19 +8,16 @@ import numpy as np
 
 ## use pyenv 3.12.0
 
-folder = "twofold1:1"
-exp_name = "0_0125_32_05022025"
+folder = "twofold1to1"
+exp_name = "0_025_32_06022025"
 exp_path = "/Users/malte/polybox/Shared/Robot-Malte/CombinationProject/" + folder
 
 ## The order of the plates array defines the order in which the plates are created.
 # This is important, low concentrations should be first, because the same tips are used.
-plates = ["antibiotic8", "antibiotic16"]
+plates = ["antibiotic0", "antibiotic025", "antibiotic32"]
 # the read order defines the order in which the plates are read.
 # Plates may appear multiple times in the read order, but only once in the plates array.
-read_order = [
-    "assay16",
-    "assay8",
-]
+read_order = ["assay32", "assay0", "assay32", "assay025"]
 
 
 pm = PathManager(basepath="current")
@@ -38,6 +35,7 @@ setup = pdSetup(config, experiment, plates)
 workflow = pdWorkflow(setup)
 workflow.grow_overnight()
 workflow.prepare_exp_cultures()
+workflow.fill_replicates()
 workflow.treat_cultures()
 workflow.luminescence_read_loop(read_order)
 
@@ -47,3 +45,6 @@ workflow.luminescence_read_loop(read_order)
 # WL-Treat cultures
 # for i:
 #     WL-Lumread plate i
+
+wl = workflow.setup_worklist("lum_read_test.gwl")
+wl.add(setup.lumread.measure("test.xml"))

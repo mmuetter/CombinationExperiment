@@ -35,8 +35,10 @@ class AssayConfiguration:
     overnight_incubation_time = 16 * 60 * 60  # 16 hours
     exponential_growth_time = 1.5 * 60 * 60  # 90 minutes
     assay_duration = 4 * 60 * 60  # 4 hours
+    approx_plate_read_duration = 3  # minutes
 
     # overnight plate (12 col)
-    strain_reservoir_well_volume = 5000
+    # should last for 4 plates. 5 * 6 * 6 * 50 ul = 9000 ul
+    strain_reservoir_well_volume = 10000
     overnight_culture_cols = [1, 4, 7, 10]
     exponential_culture_cols = [2, 5, 8, 11]
