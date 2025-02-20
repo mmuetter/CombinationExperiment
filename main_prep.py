@@ -1,16 +1,18 @@
 from pypetting_extra import Experiment
 from configurations import AssayConfiguration
-from setup_drug_plates import DrugPlateSetup
+from setup_drug_plates import CombineDrugsSetup
 from workflow_prep import PrepWorkflow
 from general_classes import PathManager
 import pandas as pd
 import numpy as np
 from functions import layout_antibiotic_plate
+import itertools
+
 
 ## use pyenv 3.12.0
 
 folder = "twofold1to1"
-exp_name = "prep_plates_06022025"
+exp_name = "test_new"
 exp_path = "/Users/malte/polybox/Shared/Robot-Malte/CombinationProject/" + folder
 
 pm = PathManager(basepath="current")
@@ -23,31 +25,34 @@ experiment = Experiment(
 )
 
 config = AssayConfiguration()
-setup = DrugPlateSetup(config, experiment)
+setup = CombineDrugsSetup(config, experiment)
+
+
+# Example vector y
+y = [1, 2, 3, 4]  # Replace with your actual vector
+
+# Generate unique index pairs (i, j) with i < j to avoid duplicates
+index_pairs = list(itertools.combinations(range(len(config.drugs)), 2))
+
+# Construct dictionary with index as key and (i, j) pairs
+combinations = {
+    idx: {
+        "i": i,
+        "j": j,
+        "a": config.drugs[i],
+        "b": config.drugs[j],
+        "Pa": setup.drug_reservoirs[i],
+        "Pb": setup.drug_reservoirs[j],
+    }
+    for idx, (i, j) in enumerate(index_pairs)
+}
+
+setup.define_antibiotic_plates(combinations)
+# Print result
+print(combinations)
+
+
 workflow = PrepWorkflow(setup)
-workflow.prefill_drug_reservoir()
-workflow.dilution_row_drug_reservoir()
-prefix = "combine_"
-
-base_df = layout_antibiotic_plate(drugs, 0.5, 0.5)
-mic_dict = dict(zip(drugs.drug, drugs.micRef))
-[conc for conc in config.concentration_gradient]
-cols = config.concentration_gradient
-cols.sort(reverse=True)
-names = [f"antibiotics{"".join(str(s).split(".")) }" for s in cols]
-concentration_col_dict = dict(
-    zip(names, np.array(range(len(config.concentration_gradient))) + 1)
-)
-for plate, name, rel_conc in zip(
-    setup.antibiotic_plates, config.plate_names, config.concentration_gradient
-):
-    src_col = concentration_col_dict[name]
-    workflow.combine_drugs(plate, 0.5, 0.5, prefix + name, src_col)
-    df = base_df.copy()
-    df["rel_conc"] = rel_conc
-    experiment.save_csv(df, "setup_" + name + ".csv")
-
-drugs["cmax_mic"] = 32
-drugs["cmax"] = drugs.cmax_mic * drugs.micRef
-drugs["V_stock_ul"] = drugs.cmax / (drugs.stock)
-experiment.save_csv(drugs, "fill_table.csv")
+for i, combination in combinations.items():
+    workflow.add_drug_a(i, combination)
+    workflow.add_drug_b(i, combination)

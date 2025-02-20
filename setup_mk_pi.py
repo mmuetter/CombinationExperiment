@@ -32,7 +32,7 @@ greiner96 = labwares["greiner96"]
 dw12col = Labware("12Col Through", 8, 12)
 
 
-class CombineDrugsSetup:
+class PiSetup:
     def __init__(self, config: AssayConfiguration, experiment: Experiment):
         self.config = config
         experiment.clone_folder("evoscripts")
@@ -50,6 +50,8 @@ class CombineDrugsSetup:
             plate = self.define_drug_reservoir(i, drug)
             self.drug_reservoirs.append(plate)
 
+        self.medium_trough = self.define_medium_trough()
+
     def define_drug_reservoir(
         self,
         position,
@@ -59,17 +61,17 @@ class CombineDrugsSetup:
         plate_name = f"{name}_reservoir"
         return storex.cartridges[4].define_plate(plate_name, labware, position)
 
-    def define_antibiotic_plates(
+    def define_medium_trough(
         self,
-        combinations: dict,
+        site=0,
+        name="medium trough",
+        carrier_name="MP 3Pos Deck",
+        labware=dw12col,
     ):
-        for _, combination in combinations.items():
-            label = f"{combination['a']}_{combination['b']}_I"
-            plate = storex.define_plate_next_free_site(label, greiner96)
-            combination.update({"Pab_I": plate})
-            label = f"{combination['a']}_{combination['b']}_II"
-            plate = storex.define_plate_next_free_site(label, greiner96)
-            combination.update({"Pab_II": plate})
+        plate_name = f"{name}"
+        plate = worktable.carrier[carrier_name].define_plate(plate_name, labware, site)
+        self.location.add(plate)
+        return plate
 
     def storex_locations(self):
         return storex.locations

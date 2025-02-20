@@ -194,15 +194,12 @@ class pdWorkflow:
         )
         n_loops = int(np.ceil(self.config.assay_duration / approx_time_per_loop_s))
 
-        counter_dict = dict(
-            zip(self.setup.assay_plate_names, [0] * len(self.setup.assay_plate_names))
-        )
+        assay_plate_names = [plate.name for plate in self.setup.assayplates]
+        counter_dict = dict(zip(assay_plate_names, [0] * len(assay_plate_names)))
+
         for i in range(n_loops):
             wl = self.setup_worklist("loop_" + str(i + 1) + ".gwl")
-            for plate in read_order:
-                print(counter_dict[plate])
-                counter_dict[plate] += 1
-                assayplate = self.setup.assay_dict[plate]
+            for assayplate in self.setup.assayplates:
                 wl.add(
                     roma.instert_plate_to_reader(
                         assayplate,
@@ -212,9 +209,13 @@ class pdWorkflow:
                 )
                 wl.add(
                     self.setup.lumread.measure(
-                        plate + "_i" + str(counter_dict[plate]) + ".xml"
+                        assayplate.name
+                        + "_i"
+                        + str(counter_dict[assayplate.name])
+                        + ".xml"
                     )
                 )
+                counter_dict[assayplate.name] += 1
                 wl.add(roma.incubate(assayplate))
 
     def setup_worklist(self, name):

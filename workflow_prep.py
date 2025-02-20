@@ -1,6 +1,7 @@
 from setup_drug_plates import (
     liha,
     roma,
+    mca,
     tilter,
     plate1_pos,
     plate2_pos,
@@ -10,6 +11,7 @@ from setup_drug_plates import (
     lid3_pos,
     rotated_site,
 )
+from pypetting import user_prompt
 from dataclasses import dataclass
 import numpy as np
 
@@ -23,96 +25,80 @@ class PrepWorkflow:
         self.tip_arr = [False] + 6 * [True] + [False]
         self.column_mask96 = self.tip_arr
         self.column_mask384 = np.array(2 * [False] + 6 * [True, False] + 2 * [False])
-        self.column_mask96_rotated = np.array([False] + 6 * [True] + 5 * [False])
+        self.column_mask_rotated_I = np.array(6 * [True] + 6 * [False])
+        self.column_mask_rotated_II = np.array(6 * [True] + 6 * [False])
 
-    def prefill_drug_reservoir(self):
-        wl = self.setup_worklist("prefill_drug_reservoir.gwl")
+    def add_drug_a(self, i, combination):
+        wl = self.setup_worklist(f"combination_{i}_add_a.gwl")
+        transfer_vol = self.config.drug_plate_vol / 2
+        Pa = combination["Pa"]
+        wl.add(mca.get_tips())
+        for Pab in [combination["Pab_I"], combination["Pab_II"]]:
+
+            wl.add(
+                roma.move_plate(
+                    Pa,
+                    lid1_pos,
+                    new_lid_gridsite=plate1_pos,
+                    end_with_covered_plate=False,
+                )
+            )
+
+            wl.add(
+                roma.move_plate(
+                    Pab,
+                    plate2_pos,
+                    new_lid_gridsite=lid2_pos,
+                    end_with_covered_plate=False,
+                )
+            )
+
+            wl.add(mca.aspirate(Pa, 1, 1, transfer_vol))
+            wl.add(mca.dispense(Pab, 1, 1, transfer_vol))
+            wl.add(roma.incubate(Pab))
+        wl.add(mca.return_tips())
+        wl.add(roma.incubate(Pa))
+        wl.add(user_prompt("replace tips"))
+
+    def add_drug_b(self, i, combination):
+        wl = self.setup_worklist(f"combination_{i}_add_b.gwl")
+        transfer_vol = self.config.drug_plate_vol / 2
+        Pb = combination["Pb"]
         wl.add(liha.sterile_wash())
-
-        wl.add(
-            liha.fill_plate(
-                self.setup.medium_reservoir,
-                self.setup.drug_reservoir,
-                self.config.antibiotic_reservoir_plate_final_vol,
-                self.column_mask96,
-                self.column_mask96,
-                liquid_class="Minimal FD ZMAX",
-                tip_array=self.tip_arr,
-                start_col=2,
-                end_col=len(self.config.concentration_gradient),
+        for Pab, src_col_mask in zip(
+            [combination["Pab_II"], combination["Pab_I"]],
+            [self.column_mask_rotated_II, self.column_mask_rotated_I],
+        ):
+            wl.add(
+                roma.move_plate(
+                    Pb,
+                    rotated_site,
+                    new_lid_gridsite=lid3_pos,
+                    end_with_covered_plate=False,
+                )
             )
-        )
-
-    def dilution_row_drug_reservoir(self):
-        wl = self.setup_worklist("dilution_row_drug_reservoir.gwl")
-        wl.add(
-            liha.dilution_row(
-                self.setup.drug_reservoir,
-                self.column_mask96,
-                self.config.antibiotic_reservoir_plate_final_vol * 2,
-                start_col=1,
-                stop_at_col=len(self.config.concentration_gradient) - 1,
-                dilution_factor=2,
-                tip_array=self.tip_arr,
+            wl.add(
+                roma.move_plate(
+                    Pab,
+                    plate2_pos,
+                    new_lid_gridsite=lid2_pos,
+                    end_with_covered_plate=False,
+                )
             )
-        )
+            wl.add(
+                liha.fill_plate(
+                    Pb,
+                    Pab,
+                    transfer_vol,
+                    src_col_mask,
+                    self.column_mask96,
+                    tip_array=self.tip_arr,
+                    end_col=8,
+                )
+            )
+            wl.add(roma.incubate(Pb))
         wl.add(liha.sterile_wash())
-
-    def combine_drugs(self, plate, pA, pB, label, src_col):
-        if pA + pB != 1:
-            raise ValueError("pA + pB must be 1")
-        wl = self.setup_worklist(label + ".gwl")
-        wl.add(liha.sterile_wash())
-        wl.add(
-            roma.move_plate(
-                plate,
-                plate1_pos,
-                new_lid_gridsite=lid1_pos,
-                end_with_covered_plate=False,
-            )
-        )
-
-        vol_A = pA * self.config.drug_plate_vol
-        wl.add(
-            liha.fill_plate(
-                self.setup.drug_reservoir,
-                plate,
-                vol_A,
-                self.column_mask96,
-                self.column_mask96,
-                liquid_class="Minimal FD ZMAX",
-                tip_array=self.tip_arr,
-                start_col=2,
-                end_col=7,
-                src_col=src_col,
-            )
-        )
-
-        wl.add(
-            roma.move_plate(
-                plate,
-                rotated_site,
-                new_lid_gridsite=lid1_pos,
-                end_with_covered_plate=False,
-            )
-        )
-        vol_B = pB * self.config.drug_plate_vol
-        wl.add(
-            liha.fill_plate(
-                self.setup.drug_reservoir,
-                plate,
-                vol_B,
-                self.column_mask96,
-                self.column_mask96_rotated,
-                liquid_class="Minimal FD ZMAX",
-                tip_array=self.tip_arr,
-                start_col=2,
-                end_col=7,
-                src_col=src_col,
-            )
-        )
-        wl.add(roma.store(plate))
-        wl.add(liha.sterile_wash(), msg=f"plate_{label}_done")
+        wl.add(roma.incubate(Pb))
 
     def setup_worklist(self, name):
         return self.experiment.setup_worklist(name, protocol=self.protocol)

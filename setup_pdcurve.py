@@ -32,9 +32,7 @@ dw12col = Labware("12Col Through", 8, 12)
 
 
 class pdSetup:
-    def __init__(
-        self, config: AssayConfiguration, experiment: Experiment, antibiotic_plate_names
-    ):
+    def __init__(self, config: AssayConfiguration, experiment: Experiment, drug_pairs):
         self.config = config
         self.experiment = experiment
 
@@ -50,15 +48,16 @@ class pdSetup:
         self.location.add(mca.tips[0])
 
         # Define Hardware
-        self.antibiotic_plate_names = antibiotic_plate_names
-        self.assay_plate_names = [
-            f"assay{re.search(r'\d+', s).group()}" for s in antibiotic_plate_names
-        ]
+        self.drug_pairs = drug_pairs
+        combinations = [f"{pair[0]}_{pair[1]}" for pair in drug_pairs]
+        self.antibiotic_plates = []
+        self.assay_plates = []
+        for combination in combinations:
+            self.antibiotic_plates.extend(self.define_antibiotic_plates(combination))
+            self.assay_plates.extend(self.define_assay_plate(combination))
+
         self.overnight_12col = self.define_overnight_plate()
         self.medium_trough = self.define_medium_trough()
-        self.assayplates = self.define_assay_plate(self.assay_plate_names)
-        self.antibiotic_plates = self.define_antibiotic_plates(antibiotic_plate_names)
-        self.assay_dict = dict(zip(self.assay_plate_names, self.assayplates))
         experiment.save_csv(self.storex_locations(), "storex_locations.csv")
 
     def define_overnight_plate(
@@ -82,21 +81,23 @@ class pdSetup:
         self.location.add(trough)
         return trough
 
-    def define_antibiotic_plates(self, plate_names):
+    def define_antibiotic_plates(self, combination):
         plates = []
-        for i, name in enumerate(plate_names):
-            print(i, name)
-            plate = shelf.define_plate(name, greiner96, 31 - i, is_store_pos=True)
+        for i in ["I", "II"]:
+            site = shelf.get_free_sites()[-1].site
+            plate = shelf.define_plate(
+                f"antibiotics_{combination}_{i}", greiner96, site, is_store_pos=True
+            )
             self.location.add(plate)
             plates.append(plate)
         return plates
 
-    def define_assay_plate(self, plate_names):
+    def define_assay_plate(self, combination):
         plates = []
-        for i, name in enumerate(plate_names):
-            plate = storex.define_plate(name, greiner384, 0, i)
-            plate.store_pos = shelf.gridsite(31 - len(plate_names) - i)
-            self.location.add(plate)
+        for i in ["I", "II"]:
+            plate = storex.define_plate_next_free_site(
+                f"assay_{combination}_{i}", greiner384
+            )
             plates.append(plate)
         return plates
 
