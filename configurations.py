@@ -1,12 +1,13 @@
 from dataclasses import dataclass, field
 from general_classes import PathManager
 import pandas as pd
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Tuple
+import itertools
 
 pm = PathManager(basepath="current")
 
 
-drugs_df = pd.read_excel(pm.file_path("drugs.xlsx", folder="notes"))
+drugs_df = pd.read_excel(pm.file_path("drugs.xlsx", folder="plate_files"))
 
 
 @dataclass(frozen=True)
@@ -16,7 +17,7 @@ class AssayConfiguration:
         default_factory=lambda: [64, 32, 16, 8, 4, 2, 1.5, 1, 0.75, 0.5, 0.25, 0]
     )
     columns: List[int] = field(default_factory=lambda: list(range(1, 13)))
-    antibiotic_reservoir_plate_final_vol: int = 3000
+    antibiotic_reservoir_plate_final_vol: int = 8000
     pi_feeding_cols: Dict[int, Optional[int]] = field(init=False)
     pi_column_concentrations: Dict[int, float] = field(init=False)
     pi_transfer_volumes: Dict[int, Optional[float]] = field(init=False)
@@ -29,19 +30,17 @@ class AssayConfiguration:
 
     # assayplate
     assay_total_vol: int = 60
-    assay_col_start: int = 1
-    assay_col_end: int = 24
 
     # durations
     overnight_incubation_time: int = 16 * 60 * 60  # 16 hours
-    exponential_growth_time: int = int(1.5 * 60 * 60)  # 90 minutes
-    assay_duration: int = 4 * 60 * 60  # 4 hours
-    approx_plate_read_duration: int = 3 * 60  # minutes
+    exponential_growth_time: int = int(2 * 60 * 60)  # 2 hours
+    assay_duration_h: int = 5  # 5 hours
+    approx_plate_read_duration: int = 5  # minutes
 
     # overnight plate (12 col)
     strain_reservoir_well_volume: int = 10000
     overnight_culture_cols: List[int] = field(init=False)
-    exponential_culture_cols: List[int] = field(init=False)
+    combinations: Dict[Tuple[str, str], Dict[str, Optional[float]]] = field(init=False)
 
     def __post_init__(self):
         object.__setattr__(
@@ -62,7 +61,20 @@ class AssayConfiguration:
             self, "drugs", list(drugs_df.drug.values)
         )  # Ensure drugs is an instance variable
         object.__setattr__(self, "overnight_culture_cols", [1, 4, 7, 10])
-        object.__setattr__(self, "exponential_culture_cols", [2, 5, 8, 11])
+        index_pairs = list(itertools.combinations(range(len(self.drugs)), 2))
+        combo_dict = {}
+        counter = 0
+        for idx1, idx2 in index_pairs:
+            drug1 = self.drugs[idx1]
+            drug2 = self.drugs[idx2]
+            combo_dict[counter] = {
+                "i": idx1,
+                "j": idx2,
+                "a": drug1,
+                "b": drug2,
+            }
+            counter += 1
+        object.__setattr__(self, "combinations", combo_dict)
 
     def _calculate_pi_transfer_volumes(self) -> Dict[int, Optional[float]]:
         transfer_volumes = {}

@@ -1,32 +1,41 @@
 from pypetting_extra import Experiment
 from configurations import AssayConfiguration
-from setup_mk_pi import PiSetup, liha, roma, lid2_pos, plate2_pos
-from workflow_mk_pi import PiWorkflow
-from general_classes import PathManager
-import pandas as pd
-import numpy as np
+from I_setup_mk_pi import PiSetup, liha, roma, lid2_pos, plate2_pos, storex
+from I_workflow_mk_pi import PiWorkflow
+from files import SetupFiles
+
 
 ## use pyenv 3.12.0
 
 folder = "twofold1to1"
-exp_name = "test_18022025"
+exp_name = "debug"
 exp_path = "/Users/malte/polybox/Shared/Robot-Malte/CombinationProject/" + folder
 
 experiment = Experiment(
     exp_name,
     exp_path,
     "C:\\Users\\COMPUTER\\polybox\\Robot-Malte\\CombinationProject\\" + folder,
+    default_folders=["notes_I", "worklists_I"],
+    default_keys=["notes_I", "wl_I"],
 )
 
 config = AssayConfiguration()
 setup = PiSetup(config, experiment)
+files = SetupFiles(config, experiment)
+files.mk_fill_table()
+files.mk_reservoir_files()
+files.mk_combined_drug_files()
 
-protocol = experiment.setup_protocol()
+experiment.save_csv(storex.locations(), "storex_locations.csv", folder_key="notes_I")
+
+protocol = experiment.setup_protocol(folder_key="notes_I")
 workflow = PiWorkflow(setup)
-for drug_reservoir in setup.drug_reservoirs:
+for i, drug_reservoir in enumerate(setup.drug_reservoirs):
     print(drug_reservoir.name)
 
-    wl = experiment.setup_worklist(f"{drug_reservoir.name}.gwl", protocol=protocol)
+    wl = experiment.setup_worklist(
+        f"reservoir_{i}.gwl", protocol=protocol, key="wl_I", folder_name="worklists_I"
+    )
     wl.add(liha.sterile_wash())
     wl.add(
         roma.move_plate(

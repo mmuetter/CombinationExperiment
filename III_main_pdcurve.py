@@ -1,7 +1,7 @@
 from pypetting_extra import Experiment
 from configurations import AssayConfiguration
-from setup_pdcurve import pdSetup
-from workflow_pdcurve import pdWorkflow
+from III_setup_pdcurve import pdSetup
+from III_workflow_pdcurve import pdWorkflow
 from general_classes import PathManager
 import pandas as pd
 import numpy as np
@@ -9,26 +9,34 @@ import numpy as np
 ## use pyenv 3.12.0
 
 folder = "twofold1to1"
-exp_name = "test2"
+exp_name = "debug"
 exp_path = "/Users/malte/polybox/Shared/Robot-Malte/CombinationProject/" + folder
 
-drug_pairs = [["amoxicillin", "colistin"], ["amoxicillin", "chloramphenicol"]]
+combination_idx = [0]
 
 pm = PathManager(basepath="current")
 # drugs = pd.read_excel(pm.file_path("drugs.xlsx", folder="notes"))
+
 
 experiment = Experiment(
     exp_name,
     exp_path,
     "C:\\Users\\COMPUTER\\polybox\\Robot-Malte\\CombinationProject\\" + folder,
+    default_folders=["notes_III", "worklists_III"],
+    default_keys=["notes_III", "wl_III"],
 )
 
 config = AssayConfiguration()
-setup = pdSetup(config, experiment, drug_pairs)
+setup = pdSetup(config, experiment, combination_idx)
+
 
 workflow = pdWorkflow(setup)
 workflow.grow_overnight()
+workflow.prefill_assay_plates()
 workflow.prepare_exp_cultures()
-workflow.fill_replicates()
+
+
 workflow.treat_cultures()
+
+
 workflow.luminescence_read_loop()

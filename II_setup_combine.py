@@ -38,11 +38,11 @@ class CombineDrugsSetup:
         experiment.clone_folder("evoscripts")
         experiment.clone_folder("cmd_scripts")
         experiment.clone_folder("reader_settings")
-        experiment.clone_folder("notes")
+        experiment.clone_folder("notes_II")
         experiment.clone_folder("eval_code")
         self.lumread = experiment.setup_measurement("lum_count_exp.xml", "lum_files")
         experiment.setup_pickolo_folder("img", "img_files", liha)
-        self.location = experiment.setup_location_file()
+        self.location = experiment.setup_location_file(folderkey="notes_II")
         self.experiment = experiment
 
         self.drug_reservoirs = []
@@ -57,7 +57,8 @@ class CombineDrugsSetup:
         labware=dw12col,
     ):
         plate_name = f"{name}_reservoir"
-        return storex.cartridges[4].define_plate(plate_name, labware, position)
+        reservoir = storex.cartridges[4].define_plate(plate_name, labware, position)
+        return reservoir
 
     def define_antibiotic_plates(
         self,

@@ -1,4 +1,4 @@
-from setup_drug_plates import (
+from II_setup_combine import (
     liha,
     roma,
     tilter,
@@ -14,12 +14,13 @@ from dataclasses import dataclass
 import numpy as np
 
 
+# Pi = Plate_i
 class PiWorkflow:
     def __init__(self, setup: dataclass):
         self.experiment = experiment = setup.experiment
         self.setup = setup
         self.config = setup.config
-        self.protocol = experiment.setup_protocol()
+        self.protocol = experiment.setup_protocol(folder_key="notes_I")
         self.tips = 8 * [True]
         self.tip_arr = [False] + 6 * [True] + [False]
         self.column_mask96_all = np.array(self.tips)
@@ -38,6 +39,7 @@ class PiWorkflow:
                 fill_volume / sum(self.tips),
                 self.column_mask96_all,
                 tip_array=self.tips,
+                liquid_class="Minimal FD ZMAX",
             )
         return wl
 
@@ -52,6 +54,7 @@ class PiWorkflow:
         src_col = self.config.pi_feeding_cols[target_col]
         total_vol = self.config.pi_transfer_volumes[target_col]
         wl = []
+        print(src_col, target_col)
         if total_vol:
             transfer_volume = total_vol / sum(self.tips)
             wl += liha.vol_transfer(
@@ -62,6 +65,7 @@ class PiWorkflow:
                 transfer_volume,
                 self.column_mask96_all,
                 tip_array=self.tips,
+                liquid_class="Minimal FD ZMAX",
             )
             wl += liha.mix(
                 drug_reservoir,
@@ -74,4 +78,6 @@ class PiWorkflow:
         return wl
 
     def setup_worklist(self, name):
-        return self.experiment.setup_worklist(name, protocol=self.protocol)
+        return self.experiment.setup_worklist(
+            name, protocol=self.protocol, key="wl_I", folder="worklists_I"
+        )

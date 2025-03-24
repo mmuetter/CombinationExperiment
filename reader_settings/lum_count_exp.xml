@@ -1,9 +1,9 @@
 <TecanFile xmlns:xsi&equal;&quote;http:// www.w3.org/ 2001/ XMLSchema-instance&quote; xsi:schemaLocation&equal;&quote;tecan.at.schema.documents Main.xsd&quote; fileformat&equal;&quote;Tecan.At.Measurement&quote; fileversion&equal;&quote;2.0&quote; xmlns&equal;&quote;tecan.at.schema.documents&quote;>
-    <FileInfo type&equal;&quote;&quote; instrument&equal;&quote;infinite 200Pro&quote; version&equal;&quote;&quote; createdFrom&equal;&quote;COMPUTER&quote; createdAt&equal;&quote;2025-02-05T11:36:03.1745021Z&quote; createdWith&equal;&quote;Tecan.At.XFluor.ReaderEditor.XFluorReaderEditor&quote; description&equal;&quote;&quote; />
+    <FileInfo type&equal;&quote;&quote; instrument&equal;&quote;infinite 200Pro&quote; version&equal;&quote;&quote; createdFrom&equal;&quote;COMPUTER&quote; createdAt&equal;&quote;2025-03-24T12:24:37.5838018Z&quote; createdWith&equal;&quote;Tecan.At.XFluor.ReaderEditor.XFluorReaderEditor&quote; description&equal;&quote;&quote; />
     <TecanMeasurement id&equal;&quote;1&quote; class&equal;&quote;Measurement&quote;>
         <MeasurementManualCycle id&equal;&quote;2&quote; number&equal;&quote;1&quote; type&equal;&quote;Standard&quote;>
             <CyclePlate id&equal;&quote;3&quote; file&equal;&quote;GRE384sw&quote; plateWithCover&equal;&quote;False&quote;>
-                <PlateRange id&equal;&quote;4&quote; range&equal;&quote;B2:O15&quote; auto&equal;&quote;false&quote;>
+                <PlateRange id&equal;&quote;4&quote; range&equal;&quote;A1:P24&quote; auto&equal;&quote;false&quote;>
                     <Shaking id&equal;&quote;5&quote; mode&equal;&quote;Orbital&quote; time&equal;&quote;PT5S&quote; frequency&equal;&quote;0&quote; amplitude&equal;&quote;1000&quote; maxDeviation&equal;&quote;PT0S&quote; settleTime&equal;&quote;PT0S&quote; />
                     <Shaking id&equal;&quote;6&quote; mode&equal;&quote;Orbital&quote; time&equal;&quote;PT5S&quote; frequency&equal;&quote;0&quote; amplitude&equal;&quote;1000&quote; maxDeviation&equal;&quote;PT0S&quote; settleTime&equal;&quote;PT0S&quote; />
                     <WaitTime id&equal;&quote;7&quote; timeSpan&equal;&quote;PT5S&quote; maxDeviation&equal;&quote;PT0S&quote; refTimeID&equal;&quote;0&quote; ignoreInLastCycle&equal;&quote;False&quote; />

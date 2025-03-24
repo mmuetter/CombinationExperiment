@@ -1,7 +1,0 @@
-,drug,abbrv,row,stock,micRef,cmax_mic,cmax,V_stock_ul
-0,amoxicillin,AMO,b,16,8,32,256,16.0
-1,chloramphenicol,CHL,c,16,8,32,256,16.0
-2,colistin,COL,f,8,1,32,32,4.0
-3,fosfomycin,FOS,d,16,2,32,64,4.0
-4,polymyxinB,POL,g,8,2,32,64,8.0
-5,tetracycline,TET,e,8,1,32,32,4.0

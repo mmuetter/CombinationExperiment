@@ -32,17 +32,19 @@ greiner96 = labwares["greiner96"]
 dw12col = Labware("12Col Through", 8, 12)
 
 
+# Pi = Reservoir plate number i
 class PiSetup:
     def __init__(self, config: AssayConfiguration, experiment: Experiment):
         self.config = config
         experiment.clone_folder("evoscripts")
         experiment.clone_folder("cmd_scripts")
         experiment.clone_folder("reader_settings")
-        experiment.clone_folder("notes")
+        experiment.clone_folder("notes_I")
+        experiment.clone_folder("plate_files")
         experiment.clone_folder("eval_code")
         self.lumread = experiment.setup_measurement("lum_count_exp.xml", "lum_files")
         experiment.setup_pickolo_folder("img", "img_files", liha)
-        self.location = experiment.setup_location_file()
+        self.location = experiment.setup_location_file(folderkey="notes_I")
         self.experiment = experiment
 
         self.drug_reservoirs = []
