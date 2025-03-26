@@ -10,7 +10,7 @@ import itertools
 ## use pyenv 3.12.0
 
 folder = "twofold1to1"
-exp_name = "debug"
+exp_name = "run_1"
 exp_path = "/Users/malte/polybox/Shared/Robot-Malte/CombinationProject/" + folder
 
 pm = PathManager(basepath="current")

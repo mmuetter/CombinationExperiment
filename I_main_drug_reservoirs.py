@@ -8,7 +8,7 @@ from files import SetupFiles
 ## use pyenv 3.12.0
 
 folder = "twofold1to1"
-exp_name = "debug"
+exp_name = "run_1"
 exp_path = "/Users/malte/polybox/Shared/Robot-Malte/CombinationProject/" + folder
 
 experiment = Experiment(
@@ -45,6 +45,9 @@ for i, drug_reservoir in enumerate(setup.drug_reservoirs):
             end_with_covered_plate=False,
         )
     )
-    wl.add(workflow.fill_LB(drug_reservoir))
-    wl.add(workflow.dilution_row_drug_reservoir(drug_reservoir))
+    wl.add(workflow.fill_LB(drug_reservoir), msg=f"fill_LB_plate_{drug_reservoir.name}")
+    wl.add(
+        workflow.dilution_row_drug_reservoir(drug_reservoir),
+        msg=f"perform_dilution_row_{drug_reservoir.name}",
+    )
     wl.add(roma.incubate(drug_reservoir))

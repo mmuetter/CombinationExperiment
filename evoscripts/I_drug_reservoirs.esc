@@ -1,5 +1,5 @@
-D5BCD440
-20250311_141013 Admin           
+25BF70BC
+20250326_095036 Admin           
                                                                                                                                 
 Admininstrator                                                                                                                  
 --{ RES }--
@@ -161,8 +161,9 @@ V;200
 998;65;
 996;0;0;
 --{ RPG }--
-Variable(base_path,"C:\Users\COMPUTER\polybox\Robot-Malte\CombinationProject\twofold1to1\test_mk_reservoirs\",0,"",0,1.000000,10.000000,1,2,0,0);
-Variable(wl_path,"~base_path~worklists\",0,"",0,1.000000,10.000000,1,2,0,0);
+Variable(exp_name,"run_1",0,"",0,1.000000,10.000000,1,2,0,0);
+Variable(base_path,"C:\Users\COMPUTER\polybox\Robot-Malte\CombinationProject\twofold1to1\~exp_name~\",0,"",0,1.000000,10.000000,1,2,0,0);
+Variable(wl_path,"~base_path~worklists_I\",0,"",0,1.000000,10.000000,1,2,0,0);
 Variable(evo_path,"~base_path~evoscripts\",0,"",0,1.000000,10.000000,1,2,0,0);
 UserPrompt("wl path correct?~wl_path~",0,-1);
 BeginLoop("6","i");

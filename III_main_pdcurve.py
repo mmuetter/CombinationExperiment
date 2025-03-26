@@ -3,20 +3,17 @@ from configurations import AssayConfiguration
 from III_setup_pdcurve import pdSetup
 from III_workflow_pdcurve import pdWorkflow
 from general_classes import PathManager
-import pandas as pd
-import numpy as np
+
 
 ## use pyenv 3.12.0
 
 folder = "twofold1to1"
-exp_name = "debug"
+exp_name = "run_1"
 exp_path = "/Users/malte/polybox/Shared/Robot-Malte/CombinationProject/" + folder
 
 combination_idx = [0]
 
 pm = PathManager(basepath="current")
-# drugs = pd.read_excel(pm.file_path("drugs.xlsx", folder="notes"))
-
 
 experiment = Experiment(
     exp_name,

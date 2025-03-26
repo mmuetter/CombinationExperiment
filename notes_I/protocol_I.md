@@ -4,7 +4,7 @@
 - This script facilitates the measurement of killcurves.
     - each assay plate represents a timepoint for two antibiotics. 
     - you can perfom at max 2 assays during one run (2x2 antibiotics)
-    
+- ADJUST Drugs.xlsx (in plate files folder) to change drugs, stock concentrations, working concentrations
 
 ### Prepare
 - Configure your experiments using the configuration and setup files.
