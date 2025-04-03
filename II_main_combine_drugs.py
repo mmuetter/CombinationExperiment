@@ -3,8 +3,6 @@ from configurations import AssayConfiguration
 from II_setup_combine import CombineDrugsSetup, storex
 from II_workflow_combine import PrepWorkflow
 from general_classes import PathManager
-import pandas as pd
-import itertools
 
 
 ## use pyenv 3.12.0
@@ -24,26 +22,29 @@ experiment = Experiment(
     default_keys=["notes_II", "wl_II"],
 )
 
-
 config = AssayConfiguration()
 setup = CombineDrugsSetup(config, experiment)
-
-
-# Example vector y
-y = [1, 2, 3, 4]  # Replace with your actual vector
-
-
 combinations = config.combinations
-
 
 setup.define_antibiotic_plates(combinations)
 experiment.save_csv(storex.locations(), "storex_locations.csv", folder_key="notes_II")
-
-# Print result
-print(combinations)
-
 
 workflow = PrepWorkflow(setup)
 for i, drug in enumerate(config.drugs):
     print("\n" + drug)
     workflow.add_drug_i(i, combinations)
+
+
+###########
+reservoir_Pi = setup.drug_reservoirs[1]
+self = workflow
+drug = "chloramphenicol"
+for combination in combinations.values():
+    if drug == combination["a"]:
+        wl_a = workflow.setup_worklist("add_a.gwl")
+        print(f"Adding {drug} as component A")
+        self.add_drug_a(reservoir_Pi, combination, wl_a)
+    elif drug == combination["b"]:
+        print(f"Adding {drug} as component B")
+        wl_b = workflow.setup_worklist("add_b.gwl")
+        self.add_drug_b(reservoir_Pi, combination, wl_b)

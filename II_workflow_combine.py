@@ -11,7 +11,7 @@ from II_setup_combine import (
     lid3_pos,
     rotated_site,
 )
-from pypetting import user_prompt, comment
+from pypetting import user_prompt
 from dataclasses import dataclass
 import numpy as np
 
@@ -22,7 +22,7 @@ class PrepWorkflow:
         self.setup = setup
         self.config = setup.config
         self.protocol = experiment.setup_protocol(folder_key="notes_II")
-        self.tip_arr = [False] + 6 * [True] + [False]
+        self.tip_arr = np.array([False] + 6 * [True] + [False])
         self.column_mask96 = self.tip_arr
         self.column_mask384 = np.array(2 * [False] + 6 * [True, False] + 2 * [False])
         self.column_mask_rotated_I = np.array(6 * [True] + 6 * [False])
@@ -36,16 +36,14 @@ class PrepWorkflow:
 
         for combination in combinations.values():
             if drug == combination["a"]:
-                pass
-                # print(f"Adding {drug} as component A")
-                # wl.add(comment(f"Adding {drug} as component A"))
-                # self.add_drug_a(reservoir_Pi, combination, wl)
+                print(f"Adding {drug} as component A")
+                self.add_drug_a(reservoir_Pi, combination, wl)
             elif drug == combination["b"]:
                 print(f"Adding {drug} as component B")
-                wl.add(comment(f"Adding {drug} as component B"))
                 self.add_drug_b(reservoir_Pi, combination, wl)
 
         wl.add(mca.return_tips())
+        wl.add(liha.sterile_wash())
         wl.add(roma.incubate(reservoir_Pi))
         wl.add(user_prompt("replace tips"))
 
@@ -72,11 +70,15 @@ class PrepWorkflow:
             )
 
             wl.add(mca.aspirate(reservoir_Pi, 1, 1, transfer_vol))
-            wl.add(mca.dispense(Pab, 1, 1, transfer_vol))
+            wl.add(
+                mca.dispense(Pab, 1, 1, transfer_vol),
+                msg=f"adding_drug_A_to_{Pab.name}",
+            )
             wl.add(roma.incubate(Pab))
 
     def add_drug_b(self, reservoir_Pi, combination, wl):
         transfer_vol = self.config.drug_plate_vol / 2
+        wl.add(liha.sterile_wash())
         for Pab, src_col_mask in zip(
             [combination["Pab_II"], combination["Pab_I"]],
             [self.column_mask_rotated_II, self.column_mask_rotated_I],
@@ -88,6 +90,7 @@ class PrepWorkflow:
                         rotated_site,
                         new_lid_gridsite=plate1_pos,
                         end_with_covered_plate=False,
+                        dest_rotated=True,
                     )
                 )
 
@@ -110,9 +113,10 @@ class PrepWorkflow:
                     src_col_mask,
                     self.column_mask96,
                     tip_array=self.tip_arr,
-                    end_col=8,
+                    end_col=12,
                     liquid_class="Minimal CD ZMAX",
-                )
+                ),
+                msg=f"adding_drug_B_to_{Pab.name}",
             )
             wl.add(roma.incubate(Pab))
 

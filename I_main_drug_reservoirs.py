@@ -50,4 +50,4 @@ for i, drug_reservoir in enumerate(setup.drug_reservoirs):
         workflow.dilution_row_drug_reservoir(drug_reservoir),
         msg=f"perform_dilution_row_{drug_reservoir.name}",
     )
-    wl.add(roma.incubate(drug_reservoir))
+    wl.add(roma.incubate(drug_reservoir), msg="dilution_row_done")

@@ -30,6 +30,7 @@ corning_8row = Labware("8 Row DeepWell Corning", 8, 1)
 deepwell96 = Labware("96 DeepWell Greiner", 8, 12)
 greiner96 = labwares["greiner96"]
 dw12col = Labware("12Col Through", 8, 12)
+rotated_12col = Labware("12Col rotated", 12, 8)
 
 
 class CombineDrugsSetup:
@@ -58,6 +59,7 @@ class CombineDrugsSetup:
     ):
         plate_name = f"{name}_reservoir"
         reservoir = storex.cartridges[4].define_plate(plate_name, labware, position)
+        reservoir.add_rotated_labw(rotated_12col)
         return reservoir
 
     def define_antibiotic_plates(
