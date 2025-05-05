@@ -4,11 +4,9 @@ from II_setup_combine import CombineDrugsSetup, storex
 from II_workflow_combine import PrepWorkflow
 from general_classes import PathManager
 
-
 ## use pyenv 3.12.0
-
 folder = "twofold1to1"
-exp_name = "run_1"
+exp_name = "run_3"
 exp_path = "/Users/malte/polybox/Shared/Robot-Malte/CombinationProject/" + folder
 
 pm = PathManager(basepath="current")
@@ -33,18 +31,3 @@ workflow = PrepWorkflow(setup)
 for i, drug in enumerate(config.drugs):
     print("\n" + drug)
     workflow.add_drug_i(i, combinations)
-
-
-###########
-reservoir_Pi = setup.drug_reservoirs[1]
-self = workflow
-drug = "chloramphenicol"
-for combination in combinations.values():
-    if drug == combination["a"]:
-        wl_a = workflow.setup_worklist("add_a.gwl")
-        print(f"Adding {drug} as component A")
-        self.add_drug_a(reservoir_Pi, combination, wl_a)
-    elif drug == combination["b"]:
-        print(f"Adding {drug} as component B")
-        wl_b = workflow.setup_worklist("add_b.gwl")
-        self.add_drug_b(reservoir_Pi, combination, wl_b)

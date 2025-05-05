@@ -14,10 +14,10 @@ drugs_df = pd.read_excel(pm.file_path("drugs.xlsx", folder="plate_files"))
 class AssayConfiguration:
     # Pi - drug reservoir gradient plate
     x: List[float] = field(
-        default_factory=lambda: [64, 32, 16, 8, 4, 2, 1.5, 1, 0.75, 0.5, 0.25, 0]
+        default_factory=lambda: [64, 32, 16, 8, 4, 2, 1, 0.5, 0.25, 0.125, 0.0625, 0]
     )
     columns: List[int] = field(default_factory=lambda: list(range(1, 13)))
-    antibiotic_reservoir_plate_final_vol: int = 8000
+    antibiotic_reservoir_plate_final_vol: int = 10000
     pi_feeding_cols: Dict[int, Optional[int]] = field(init=False)
     pi_column_concentrations: Dict[int, float] = field(init=False)
     pi_transfer_volumes: Dict[int, Optional[float]] = field(init=False)
@@ -33,7 +33,7 @@ class AssayConfiguration:
 
     # durations
     overnight_incubation_time: int = 16 * 60 * 60  # 16 hours
-    exponential_growth_time: int = int(2 * 60 * 60)  # 2 hours
+    exponential_growth_time: int = int(1 * 60 * 60)  # 2 hours
     assay_duration_h: int = 5  # 5 hours
     approx_plate_read_duration: int = 5  # minutes
 
@@ -46,7 +46,7 @@ class AssayConfiguration:
         object.__setattr__(
             self,
             "pi_feeding_cols",
-            dict(zip(self.columns, [None, 1, 2, 3, 4, 5, 3, 4, 5, 6, 7, None])),
+            dict(zip(self.columns, [None, 1, 1, 1, 2, 3, 4, 4, 5, 5, 6, None])),
         )
         object.__setattr__(
             self, "pi_column_concentrations", dict(zip(self.columns, self.x * 2))

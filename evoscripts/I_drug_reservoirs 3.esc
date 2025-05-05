@@ -1,5 +1,5 @@
-93DCD1F8
-20250415_160649 Admin           
+25BF70BC
+20250326_095036 Admin           
                                                                                                                                 
 Admininstrator                                                                                                                  
 --{ RES }--
@@ -16,16 +16,16 @@ V;200
 998;0;
 998;0;
 998;0;
-998;4;DiTi 200ul AXYGEN MCA96;BlottingStation;BlottingStation;BlottingStation;
-998;tips;Blot3H2O;Blot2Bleach;Blot1Cells;
+998;4;DiTi 200ul SBS MCA96;BlottingStation;BlottingStation;BlottingStation;
+998;Labware18;Blot3H2O;Blot2Bleach;Blot1Cells;
 998;0;
 998;0;
 998;0;
 998;0;
 998;0;
 998;0;
-998;3;iPT384;;;
-998;Pintool;;;
+998;3;;;;
+998;;;;
 998;0;
 998;0;
 998;0;
@@ -33,8 +33,8 @@ V;200
 998;0;
 998;192;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 998;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-998;3;;;Trough 300ml MCA96;
-998;;;medium;
+998;3;8 Row DeepWell Corning;;;
+998;LB;;;
 998;0;
 998;0;
 998;0;
@@ -48,8 +48,8 @@ V;200
 998;;;;
 998;3;Wash Station Cleaner shallow;Wash Station Waste;Wash Station Cleaner deep;
 998;;;;
-998;2;12Col Through;384 Well Plate Greiner;
-998;overnights 12col;lid2;
+998;2;;12Col Through;
+998;;Labware19;
 998;1;;
 998;;
 998;0;
@@ -57,8 +57,8 @@ V;200
 998;0;
 998;0;
 998;0;
-998;3;384 Well Plate Greiner;384 Well Plate Greiner;96 Well Greiner SC;
-998;assay;helper;Labware17;
+998;3;;;;
+998;;;;
 998;0;
 998;0;
 998;0;
@@ -141,7 +141,7 @@ V;200
 998;0;8;Hotel384;
 998;7;
 998;126;384 Well Plate Greiner;
-998;313;384 Well Plate Greiner;
+998;313;12Col Through;
 998;311;384 Well Plate Greiner;
 998;324;96 DeepWell Greiner;
 998;329;384 Agar Plate Greiner;
@@ -161,21 +161,13 @@ V;200
 998;65;
 996;0;0;
 --{ RPG }--
-Variable(exp_name,"run_2",0,"",0,1.000000,10.000000,1,2,0,0);
+Variable(exp_name,"run_1",0,"",0,1.000000,10.000000,1,2,0,0);
 Variable(base_path,"C:\Users\COMPUTER\polybox\Robot-Malte\CombinationProject\twofold1to1\~exp_name~\",0,"",0,1.000000,10.000000,1,2,0,0);
-Variable(wl_path,"~base_path~worklists_III\",0,"",0,1.000000,10.000000,1,2,0,0);
+Variable(wl_path,"~base_path~worklists_I\",0,"",0,1.000000,10.000000,1,2,0,0);
 Variable(evo_path,"~base_path~evoscripts\",0,"",0,1.000000,10.000000,1,2,0,0);
 UserPrompt("wl path correct?~wl_path~",0,-1);
-Worklist(0,~wl_path~grow_overnight.gwl,255,"Water free dispense",0,1);Wash(255,31,1,31,0,"3.0",500,"4.0",500,10,70,30,1,0,1000,0);GetDITI2(0,"DiTi 200ul LiHa",0,0,10,70);DropDITI(0,-1,0,10,70,0);
+BeginLoop("6","i");
+Worklist(0,~wl_path~reservoir_~LOOP_i-1~.gwl,255,"Water free dispense",0,1);Wash(255,31,1,31,0,"3.0",500,"4.0",500,10,70,30,1,0,1000,0);GetDITI2(0,"DiTi 200ul LiHa",0,0,10,70);DropDITI(0,-1,0,10,70,0);
 Worklist(1,,0,"",0,1);Wash(255,31,1,31,0,"3.0",500,"4.0",500,10,70,30,1,0,1000,0);GetDITI2(0,"DiTi 200ul LiHa",0,0,10,70);DropDITI(0,-1,0,10,70,0);
-Wash(255,31,1,31,0,"30.0",500,"40.0",500,10,70,30,1,0,1000,0);
-Worklist(0,~wl_path~prefill_assay.gwl,255,"Water free dispense",0,1);Wash(255,31,1,31,0,"3.0",500,"4.0",500,10,70,30,1,0,1000,0);GetDITI2(0,"DiTi 200ul LiHa",0,0,10,70);DropDITI(0,-1,0,10,70,0);
-Worklist(1,,0,"",0,1);Wash(255,31,1,31,0,"3.0",500,"4.0",500,10,70,30,1,0,1000,0);GetDITI2(0,"DiTi 200ul LiHa",0,0,10,70);DropDITI(0,-1,0,10,70,0);
-Worklist(0,~wl_path~prepare_exponential_cultures.gwl,255,"Water free dispense",0,1);Wash(255,31,1,31,0,"3.0",500,"4.0",500,10,70,30,1,0,1000,0);GetDITI2(0,"DiTi 200ul LiHa",0,0,10,70);DropDITI(0,-1,0,10,70,0);
-Worklist(1,,0,"",0,1);Wash(255,31,1,31,0,"3.0",500,"4.0",500,10,70,30,1,0,1000,0);GetDITI2(0,"DiTi 200ul LiHa",0,0,10,70);DropDITI(0,-1,0,10,70,0);
-Worklist(0,~wl_path~treat_strains.gwl,255,"Water free dispense",0,1);Wash(255,31,1,31,0,"3.0",500,"4.0",500,10,70,30,1,0,1000,0);GetDITI2(0,"DiTi 200ul LiHa",0,0,10,70);DropDITI(0,-1,0,10,70,0);
-Worklist(1,,0,"",0,1);Wash(255,31,1,31,0,"3.0",500,"4.0",500,10,70,30,1,0,1000,0);GetDITI2(0,"DiTi 200ul LiHa",0,0,10,70);DropDITI(0,-1,0,10,70,0);
-BeginLoop("30","i");
-Worklist(0,~wl_path~loop_~LOOP_i~.gwl,255,"Water free dispense",0,1);Wash(255,31,1,31,0,"3.0",500,"4.0",500,10,70,30,1,0,1000,0);GetDITI2(0,"DiTi 200ul LiHa",0,0,10,70);DropDITI(0,-1,0,10,70,0);
-Worklist(1,,0,"",0,1);Wash(255,31,1,31,0,"3.0",500,"4.0",500,10,70,30,1,0,1000,0);GetDITI2(0,"DiTi 200ul LiHa",0,0,10,70);DropDITI(0,-1,0,10,70,0);
+UserPrompt("make sure that there is still enough LB in the trough",0,-1);
 EndLoop();

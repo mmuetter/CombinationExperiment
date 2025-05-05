@@ -2,6 +2,12 @@
 - Prepare reservoir plates first (run I)
 - All files in notes_II
 
+## vs a)
+This version is to create all drug combinations. 
+If that is the intention this script is substantially more efficient regarding tips and waste.
+
+## vs b) 
+This script is intendet to create one combination plate (e.g. to repeat a combination).
 
 
 ## Setup

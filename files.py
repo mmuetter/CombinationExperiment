@@ -27,15 +27,13 @@ class SetupFiles:
         path = os.path.join(self.folder_path, filename)
         df.to_json(path, orient="records", indent=2)
 
-    def mk_fill_table(self):
+    def mk_fill_table(self, V=20):
         self.drugs_df["cmax"] = self.drugs_df.micRef * max(self.config.x)
         self.drugs_df["cmix"] = self.drugs_df["cmax"] * 10 * 2
-        self.drugs_df["V_stock per 10ml [ml]"] = (self.drugs_df["cmix"] * 10) / (
+        self.drugs_df[f"V_stock per {V}ml [ml]"] = (self.drugs_df["cmix"] * V) / (
             self.drugs_df.stock * 1000
         )
-        self.drugs_df["V_medium per 10ml [ml]"] = (
-            10 - self.drugs_df["V_stock per 10ml [ml]"]
-        )
+        self.drugs_df[f"V_LB [ml]"] = V - self.drugs_df[f"V_stock per {V}ml [ml]"]
         self.experiment.save_csv(self.drugs_df, "fill_table.csv", folder_key="notes_I")
 
     def mk_reservoir_files(self):

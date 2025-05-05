@@ -1,4 +1,4 @@
-from II_setup_combine import (
+from IIb_setup_combine import (
     liha,
     roma,
     mca,
@@ -28,13 +28,18 @@ class PrepWorkflow:
         self.column_mask_rotated_I = np.array(6 * [True] + 6 * [False])
         self.column_mask_rotated_II = np.array(6 * [False] + 6 * [True])
 
-    def add_drug_i(self, drug_i, combinations):
+    def add_drug_i(self, drug_i, combination_idx="all"):
         drug = self.config.drugs[drug_i]
         reservoir_Pi = self.setup.drug_reservoirs[drug_i]
         wl = self.setup_worklist(f"add_drug_{drug_i}.gwl")
         wl.add(mca.get_tips())
 
-        for combination in combinations.values():
+        if combination_idx != "all":
+            combinations = [self.config.combinations[combination_idx]]
+        else:
+            combinations = self.config.combinations.values()
+
+        for combination in combinations:
             if drug == combination["a"]:
                 print(f"Adding {drug} as component A")
                 self.add_drug_a(reservoir_Pi, combination, wl)
@@ -114,7 +119,8 @@ class PrepWorkflow:
                     self.column_mask96,
                     tip_array=self.tip_arr,
                     end_col=12,
-                    liquid_class="Minimal CD ZMAX",
+                    liquid_class="LB FD ZMAX",
+                    reverse_order=True,
                 ),
                 msg=f"adding_drug_B_to_{Pab.name}",
             )

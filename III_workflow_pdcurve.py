@@ -151,7 +151,7 @@ class pdWorkflow:
                         new_lid_gridsite=lid2_pos,
                     )
                 )
-                wl.add(self.setup.lumread.measure(assayplate.name + "_i0.xml"))
+                wl.add(self.setup.lumread.measure(assayplate.name + "_pre.xml"))
                 wl.add(
                     roma.move_plate(
                         assayplate,
@@ -176,6 +176,14 @@ class pdWorkflow:
                     ),
                     msg="treat_" + assayplate.name,
                 )
+                wl.add(
+                    roma.instert_plate_to_reader(
+                        assayplate,
+                        end_with_covered_plate=False,
+                        new_lid_gridsite=lid2_pos,
+                    )
+                )
+                wl.add(self.setup.lumread.measure(assayplate.name + "_i0.xml"))
                 wl.add(roma.incubate(assayplate))
                 wl.add(roma.store(antibioticplate))
 
@@ -188,7 +196,7 @@ class pdWorkflow:
         )
 
         assay_plate_names = [plate.name for plate in self.setup.assay_plates]
-        counter_dict = dict(zip(assay_plate_names, [0] * len(assay_plate_names)))
+        counter_dict = dict(zip(assay_plate_names, [1] * len(assay_plate_names)))
 
         for i in range(n_loops):
             wl = self.setup_worklist("loop_" + str(i + 1) + ".gwl")

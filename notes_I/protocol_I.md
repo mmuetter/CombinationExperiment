@@ -4,7 +4,7 @@
 ## Prepare
 - Prepare LB 
 - Prepare mix-Stocks
-  - 10ml each
+  - 20 ml each
   - according to fill table
 - 6 12-Col DW plates (reservoir plates)
 
@@ -17,6 +17,7 @@
 ## Run
 - Start script
 - Caution: script will stop after every plate, to give you a chance to check if there is enough medium.
+- Each Reservoir takes 110 ml LB.
 
 ## Turn of heat StoreX
 - Go to evoware

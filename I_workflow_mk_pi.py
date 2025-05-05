@@ -1,15 +1,4 @@
-from II_setup_combine import (
-    liha,
-    roma,
-    tilter,
-    plate1_pos,
-    plate2_pos,
-    plate3_pos,
-    lid1_pos,
-    lid2_pos,
-    lid3_pos,
-    rotated_site,
-)
+from I_setup_mk_pi import liha
 from dataclasses import dataclass
 import numpy as np
 

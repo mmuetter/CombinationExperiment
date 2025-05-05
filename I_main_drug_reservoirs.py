@@ -8,7 +8,7 @@ from files import SetupFiles
 ## use pyenv 3.12.0
 
 folder = "twofold1to1"
-exp_name = "run_1"
+exp_name = "run_3"
 exp_path = "/Users/malte/polybox/Shared/Robot-Malte/CombinationProject/" + folder
 
 experiment = Experiment(
@@ -20,6 +20,7 @@ experiment = Experiment(
 )
 
 config = AssayConfiguration()
+
 setup = PiSetup(config, experiment)
 files = SetupFiles(config, experiment)
 files.mk_fill_table()
