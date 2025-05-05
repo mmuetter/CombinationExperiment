@@ -3,6 +3,7 @@ from configurations import AssayConfiguration
 from IIb_setup_combine import CombineDrugsSetup, storex
 from II_workflow_combine import PrepWorkflow
 from general_classes import PathManager
+from II_worktable import liha, roma
 
 ## use pyenv 3.12.0
 folder = "twofold1to1"
@@ -21,14 +22,22 @@ experiment = Experiment(
 )
 
 config = AssayConfiguration()
-combination_idx = 0
+combination_idx = 6
 setup = CombineDrugsSetup(config, experiment, combination_idx)
-
+combination = config.combinations[combination_idx]
 setup.define_antibiotic_plate(combination_idx)
 experiment.save_csv(storex.locations(), "storex_locations.csv", folder_key="notes_II")
 
 workflow = PrepWorkflow(setup)
-for i, drug in enumerate(config.drugs):
-    print("\n" + drug)
-    if drug in setup.drugs:
-        workflow.add_drug_i(i, combination_idx=combination_idx)
+wl = workflow.setup_worklist(f"mk_combiplate_{combination_idx}.gwl")
+
+drug_a = combination["a"]
+reservoir_a = setup.drug_reservoirs[0]
+# workflow.add_drug_a(reservoir_a, combination, wl)
+# wl.add(roma.incubate(reservoir_a))
+
+drug_b = combination["b"]
+reservoir_b = setup.drug_reservoirs[1]
+workflow.add_drug_b(reservoir_b, combination, wl)
+wl.add(roma.incubate(reservoir_b))
+wl.add(liha.sterile_wash())

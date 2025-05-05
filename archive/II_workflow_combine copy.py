@@ -1,4 +1,4 @@
-from II_worktable import (
+from IIb_setup_combine import (
     liha,
     roma,
     mca,
@@ -31,8 +31,7 @@ class PrepWorkflow:
     def add_drug_i(self, drug_i, combination_idx="all"):
         drug = self.config.drugs[drug_i]
         reservoir_Pi = self.setup.drug_reservoirs[drug_i]
-        if not wl:
-            wl = self.setup_worklist(f"add_drug_{drug_i}.gwl")
+        wl = self.setup_worklist(f"add_drug_{drug_i}.gwl")
 
         if combination_idx != "all":
             combinations = [self.config.combinations[combination_idx]]
@@ -73,9 +72,10 @@ class PrepWorkflow:
                     end_with_covered_plate=False,
                 )
             )
+
             wl.add(mca.aspirate(reservoir_Pi, 1, 1, transfer_vol))
             wl.add(
-                mca.dispense(Pab, 1, 1, transfer_vol, retract=True),
+                mca.dispense(Pab, 1, 1, transfer_vol),
                 msg=f"adding_drug_A_to_{Pab.name}",
             )
             wl.add(roma.incubate(Pab))
@@ -119,9 +119,7 @@ class PrepWorkflow:
                     self.column_mask96,
                     tip_array=self.tip_arr,
                     end_col=12,
-                    liquid_class="LB FD ZMAX",
-                    reverse_order=True,
-                    allow_multidispense=False,
+                    liquid_class="Minimal FD ZMAX",
                 ),
                 msg=f"adding_drug_B_to_{Pab.name}",
             )
