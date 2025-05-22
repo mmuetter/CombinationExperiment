@@ -1,16 +1,17 @@
 from pypetting_extra import Experiment
 from configurations import AssayConfiguration
-from II_setup_combine import CombineDrugsSetup, storex
-from II_workflow_combine import PrepWorkflow
+from II_setup_pdcurve import pdSetup
+from II_workflow_pdcurve import pdWorkflow
 from general_classes import PathManager
+
 
 ## use pyenv 3.12.0
 folder = "twofold1to1"
-exp_name = "run_3"
+exp_name = "run_5"
 exp_path = "/Users/malte/polybox/Shared/Robot-Malte/CombinationProject/" + folder
+combination_idx = 14
 
 pm = PathManager(basepath="current")
-# drugs = pd.read_excel(pm.file_path("drugs.xlsx", folder="notes"))
 
 experiment = Experiment(
     exp_name,
@@ -21,13 +22,14 @@ experiment = Experiment(
 )
 
 config = AssayConfiguration()
-setup = CombineDrugsSetup(config, experiment)
-combinations = config.combinations
+setup = pdSetup(config, experiment, combination_idx)
 
-setup.define_antibiotic_plates(combinations)
-experiment.save_csv(storex.locations(), "storex_locations.csv", folder_key="notes_II")
+workflow = pdWorkflow(setup)
 
-workflow = PrepWorkflow(setup)
-for i, drug in enumerate(config.drugs):
-    print("\n" + drug)
-    workflow.add_drug_i(i, combinations)
+
+workflow.grow_overnight()
+workflow.prefill_assay_plates()
+workflow.prepare_exp_cultures()
+workflow.combine_plates()
+workflow.treat_cultures()
+workflow.luminescence_read_loop()

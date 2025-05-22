@@ -12,6 +12,7 @@
 - Turn off heat StoreX (see below)
 - Place medium (LB) according to locations.csv
 - Fill first col of reservoir plates with 10ml of each mix stock
+  - After completion also fill the remaining 10 ml in the first col (to avoid overful columns)
 - Place reservoir plates in StoreX accoring to storex_locations.csv
 
 ## Run

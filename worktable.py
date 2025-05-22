@@ -2,22 +2,25 @@ from pypetting_extra import default_worktable as worktable
 from labware import labwares
 import numpy as np
 
+carrier = worktable.carrier
 
 storex = worktable.incubator
 shelf = worktable.carrier["Shelf 8x4Pos"]
 
-tips_I = worktable.carrier["MP 3Pos Deck"].define_labware(labwares["diti"], 0)
-tips_II = worktable.carrier["MP 3Pos Deck"].define_labware(labwares["diti"], 1)
+tips_I = worktable.carrier["MCA96 3Pos"].define_labware(labwares["diti"], 1)
+tips_II = worktable.carrier["MCA96 3Pos"].define_labware(labwares["diti"], 2)
 
-worktable.add_tips(tips_I)
-worktable.add_tips(tips_II)
+
+mca = worktable.mca
+mca.tips = [tips_I, tips_II]
 tip_arr1 = np.array([False, True, True, True] + 4 * [False])
 tip_arr2 = np.array(4 * [False] + [True, True, True, False])
 tip_arr = tip_arr1 + tip_arr2
 
+
 liha = worktable.liha
 
-mca = worktable.mca
+
 roma = worktable.roma
 tilter = worktable.tilter
 lid1_pos = worktable.carrier["MP 2Pos Fixed"].gridsite(0)

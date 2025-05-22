@@ -1,4 +1,4 @@
-from III_setup_pdcurve import (
+from worktable import (
     liha,
     roma,
     mca,
@@ -19,8 +19,9 @@ class pdWorkflow:
     def __init__(self, setup: dataclass):
         self.experiment = experiment = setup.experiment
         self.setup = setup
+        self.combination = setup.combination
         self.config = setup.config
-        self.protocol = experiment.setup_protocol(folder_key="notes_III")
+        self.protocol = experiment.setup_protocol(folder_key="notes_II")
         self.tip_arr = [False] + 6 * [True] + [False]
         self.tip_arr8 = 8 * [True]
         self.column_mask96_8 = 8 * [True]
@@ -33,9 +34,56 @@ class pdWorkflow:
         wl.add(start_timer(1))
         wl.add(wait_timer(1, self.config.overnight_incubation_time))
 
+    def combine_plates(self):
+        wl = self.setup_worklist("combine_plates.gwl")
+        plate_A = self.setup.subreservoir_A
+
+        wl.add(
+            roma.move_plate(
+                plate_A,
+                plate2_pos,
+                new_lid_gridsite=lid2_pos,
+                end_with_covered_plate=False,
+            )
+        )
+
+        for tip_idx, suffix in zip([1, 0], ["_II", "_I"]):
+            wl.add(mca.get_tips(tip_idx=tip_idx))
+            plate_B = self.combination["antibiotics" + suffix]
+            wl.add(
+                roma.move_plate(
+                    plate_B,
+                    plate1_pos,
+                    new_lid_gridsite=lid1_pos,
+                    end_with_covered_plate=False,
+                )
+            )
+            wl.add(
+                mca.aspirate(
+                    plate_A,
+                    1,
+                    1,
+                    self.config.drug_plate_vol / 2,
+                    liquid_class="LB FD MCA",
+                )
+            )
+            wl.add(
+                mca.dispense(
+                    plate_B,
+                    1,
+                    1,
+                    self.config.drug_plate_vol / 2,
+                    liquid_class="LB FD MCA",
+                ),
+                msg="combine_" + plate_B.name,
+            )
+            wl.add(roma.store(plate_B))
+            wl.add(mca.return_tips())
+
+        wl.add(roma.store(plate_A))
+
     def _fill_helper_plate(self, wl):
         wl.add(liha.sterile_wash())
-
         wl.add(
             roma.move_plate(
                 self.setup.overnight_12col,
@@ -70,7 +118,7 @@ class pdWorkflow:
                     self.config.assay_total_vol,
                     self.column_mask96,
                     column_mask,
-                    liquid_class="Minimal FD ZMAX",
+                    liquid_class="LB FD ZMAX",
                     tip_array=self.tip_arr,
                     skip=1,
                     src_col=self.config.overnight_culture_cols[replicate],
@@ -102,6 +150,7 @@ class pdWorkflow:
                     assay_plate,
                     self.config.assay_total_vol * 0.9,
                     get_tips=True,
+                    liquid_class="LB FD MCA",
                 )
             )
             wl.add(
@@ -136,56 +185,59 @@ class pdWorkflow:
     def treat_cultures(self):
         wl = self.setup_worklist("treat_strains.gwl")
         wl.add(wait_timer(2, self.config.exponential_growth_time))
-        for i, combination in enumerate(self.setup.combinations.values()):
-            if i:
-                wl.add(user_prompt("change_tips"))
-            # important: first handle _II then _I, as _II is lower concentrated.
-            for assayplate, antibioticplate in zip(
-                [combination["assay_II"], combination["assay_I"]],
-                [combination["antibiotics_II"], combination["antibiotics_I"]],
-            ):
-                wl.add(
-                    roma.instert_plate_to_reader(
-                        assayplate,
-                        end_with_covered_plate=False,
-                        new_lid_gridsite=lid2_pos,
-                    )
+        combination = self.combination
+
+        # important: first handle _II then _I, as _II is lower concentrated.
+        for tip_idx, assayplate, antibioticplate in zip(
+            [1, 0],
+            [combination["assay_II"], combination["assay_I"]],
+            [combination["antibiotics_II"], combination["antibiotics_I"]],
+        ):
+            wl.add(
+                roma.instert_plate_to_reader(
+                    assayplate,
+                    end_with_covered_plate=False,
+                    new_lid_gridsite=lid2_pos,
                 )
-                wl.add(self.setup.lumread.measure(assayplate.name + "_pre.xml"))
-                wl.add(
-                    roma.move_plate(
-                        assayplate,
-                        plate2_pos,
-                        end_with_covered_plate=False,
-                    ),
+            )
+            wl.add(self.setup.lumread.measure(assayplate.name + "_pre.xml"))
+            wl.add(
+                roma.move_plate(
+                    assayplate,
+                    plate2_pos,
+                    end_with_covered_plate=False,
+                ),
+            )
+            wl.add(
+                roma.move_plate(
+                    antibioticplate,
+                    plate3_pos,
+                    new_lid_gridsite=lid1_pos,
+                    end_with_covered_plate=False,
                 )
-                wl.add(
-                    roma.move_plate(
-                        antibioticplate,
-                        plate3_pos,
-                        new_lid_gridsite=lid1_pos,
-                        end_with_covered_plate=False,
-                    )
+            )
+            wl.add(mca.get_tips(tip_idx=tip_idx))
+            wl.add(
+                mca.fill_384plate(
+                    antibioticplate,
+                    assayplate,
+                    self.config.assay_total_vol * 0.1,
+                    get_tips=False,
+                    liquid_class="LB CD ZMAX",
+                ),
+                msg="treat_" + assayplate.name,
+            )
+            wl.add(mca.return_tips())
+            wl.add(
+                roma.instert_plate_to_reader(
+                    assayplate,
+                    end_with_covered_plate=False,
+                    new_lid_gridsite=lid2_pos,
                 )
-                wl.add(
-                    mca.fill_384plate(
-                        antibioticplate,
-                        assayplate,
-                        self.config.assay_total_vol * 0.1,
-                        get_tips=True,
-                    ),
-                    msg="treat_" + assayplate.name,
-                )
-                wl.add(
-                    roma.instert_plate_to_reader(
-                        assayplate,
-                        end_with_covered_plate=False,
-                        new_lid_gridsite=lid2_pos,
-                    )
-                )
-                wl.add(self.setup.lumread.measure(assayplate.name + "_i0.xml"))
-                wl.add(roma.incubate(assayplate))
-                wl.add(roma.store(antibioticplate))
+            )
+            wl.add(self.setup.lumread.measure(assayplate.name + "_i0.xml"))
+            wl.add(roma.incubate(assayplate))
+            wl.add(roma.store(antibioticplate))
 
     def luminescence_read_loop(self):
         approx_time_per_loop_min = (
@@ -221,5 +273,5 @@ class pdWorkflow:
 
     def setup_worklist(self, name):
         return self.experiment.setup_worklist(
-            name, protocol=self.protocol, key="wl_III", folder_name="worklists_III"
+            name, protocol=self.protocol, key="wl_II", folder_name="worklists_II"
         )

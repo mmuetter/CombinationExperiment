@@ -3,6 +3,9 @@ import pandas as pd
 import numpy as np
 from itertools import product
 from general_classes import PathManager
+from reportlab.lib.pagesizes import A4
+from reportlab.pdfgen import canvas
+from reportlab.lib.units import mm
 
 
 class SetupFiles:
@@ -15,7 +18,7 @@ class SetupFiles:
             self.pm.file_path("drugs.xlsx", folder="plate_files")
         )
         self.drugs = list(self.drugs_df.drug.values)
-        self.ref_concentrations = dict(zip(self.drugs_df.drug, self.drugs_df.micRef))
+        self.ref_concentrations = dict(zip(self.drugs_df.drug, self.drugs_df.cRef))
         self.rel_concentrations = config.x
         self.reservoir_dfs = {}
 
@@ -28,13 +31,53 @@ class SetupFiles:
         df.to_json(path, orient="records", indent=2)
 
     def mk_fill_table(self, V=20):
-        self.drugs_df["cmax"] = self.drugs_df.micRef * max(self.config.x)
+        self.drugs_df["cmax"] = self.drugs_df.cRef * max(self.config.x)
         self.drugs_df["cmix"] = self.drugs_df["cmax"] * 10 * 2
         self.drugs_df[f"V_stock per {V}ml [ml]"] = (self.drugs_df["cmix"] * V) / (
             self.drugs_df.stock * 1000
         )
-        self.drugs_df[f"V_LB [ml]"] = V - self.drugs_df[f"V_stock per {V}ml [ml]"]
+        self.drugs_df[f"V_H2O [ml]"] = V - self.drugs_df[f"V_stock per {V}ml [ml]"]
         self.experiment.save_csv(self.drugs_df, "fill_table.csv", folder_key="notes_I")
+
+    def _compute_layout(self, cols, margin, row_pitch):
+        page_w, page_h = A4
+        usable_w = page_w - 2 * margin
+        usable_h = page_h - 2 * margin
+        label_w = usable_w / cols
+        rows_per_page = int(usable_h // row_pitch)
+        return page_w, page_h, label_w, rows_per_page
+
+    def _draw_label(self, c, x, y, text_lines, line_spacing):
+        c.setFont("Helvetica", 10)
+        c.drawString(x, y, text_lines[0])
+        c.drawString(x, y - line_spacing, text_lines[1])
+
+    def save_labels_pdf(
+        self,
+        labels_df,
+        filename,
+        cols: int = 2,
+        margin: float = 20 * mm,
+        line_spacing: float = 4 * mm,
+        row_pitch: float = 15 * mm,
+    ):
+        _, page_h, label_w, rows_per_page = self._compute_layout(
+            cols, margin, row_pitch
+        )
+        out_path = os.path.join(self.experiment.paths["notes_I"], filename)
+        c = canvas.Canvas(out_path, pagesize=A4)
+        for i, (_, row) in enumerate(labels_df.iterrows()):
+            if i and i % (cols * rows_per_page) == 0:
+                c.showPage()
+            idx = i % (cols * rows_per_page)
+            # fill down columns first, then across
+            col_idx = idx // rows_per_page
+            row_idx = idx % rows_per_page
+            x = margin + col_idx * label_w
+            y = page_h - margin - row_idx * row_pitch
+            lines = self._format_label_text(row)
+            self._draw_label(c, x, y, lines, line_spacing)
+        c.save()
 
     def mk_reservoir_files(self):
         for antibiotic, reference_concentration in self.ref_concentrations.items():
@@ -52,6 +95,33 @@ class SetupFiles:
             )
             self.save_json(reservoir_df, f"{antibiotic}_reservoir.json")
             self.reservoir_dfs[antibiotic] = reservoir_df
+
+    def mk_labels(self, subreservoir_plan):
+        df = []
+        for drug_abbrv, row in subreservoir_plan.iterrows():
+            n_A = row["A_sub min"] + row["A_sub extra"]
+            n_B = row["Bi min"] + row["Bi extra"]
+            for _ in range(n_A):
+                line = self.mk_label(drug_abbrv, "A_subreservoir", 0)
+                df.append(line)
+
+            for _ in range(n_B):
+                line = self.mk_label(drug_abbrv, "B_combination_plate_I", 1)
+                df.append(line)
+                line = self.mk_label(drug_abbrv, "B_combination_plate_II", 2)
+                df.append(line)
+        df = pd.DataFrame(df)
+        df.sort_values(["drug", "cartridge"], inplace=True)
+        return df
+
+    @staticmethod
+    def mk_label(drug_abbrv, plate_name, cart_idx):
+        line = {"drug": drug_abbrv, "cartridge": cart_idx + 1, "name": plate_name}
+        return line
+
+    @staticmethod
+    def _format_label_text(row):
+        return f"{row['drug']}, cart = {row['cartridge']}", row["name"]
 
     @staticmethod
     def mk_rotated_reservoir(reservoir_B):

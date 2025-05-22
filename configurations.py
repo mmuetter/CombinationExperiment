@@ -28,13 +28,16 @@ class AssayConfiguration:
     # 100 μL is fine as we only need 4×6 for the assay plate
     drug_plate_vol: int = 100
 
+    # subreservoir
+    drug_sub_reservoir_vol: int = 125
+
     # assayplate
     assay_total_vol: int = 60
 
     # durations
-    overnight_incubation_time: int = 16 * 60 * 60  # 16 hours
-    exponential_growth_time: int = int(1 * 60 * 60)  # 2 hours
-    assay_duration_h: int = 5  # 5 hours
+    overnight_incubation_time: int = 14 * 60 * 60  # 14 hours
+    exponential_growth_time: int = int(1 * 60 * 60)  # 1 hours
+    assay_duration_h: int = 3.1  # 5 hours
     approx_plate_read_duration: int = 5  # minutes
 
     # overnight plate (12 col)
@@ -46,7 +49,7 @@ class AssayConfiguration:
         object.__setattr__(
             self,
             "pi_feeding_cols",
-            dict(zip(self.columns, [None, 1, 1, 1, 2, 3, 4, 4, 5, 5, 6, None])),
+            dict(zip(self.columns, [None, 1, 1, 1, 2, 3, 4, 5, 6, 7, 8, None])),
         )
         object.__setattr__(
             self, "pi_column_concentrations", dict(zip(self.columns, self.x * 2))
