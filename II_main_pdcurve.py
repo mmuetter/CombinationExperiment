@@ -9,7 +9,7 @@ from general_classes import PathManager
 folder = "twofold1to1"
 exp_name = "run_5"
 exp_path = "/Users/malte/polybox/Shared/Robot-Malte/CombinationProject/" + folder
-combination_idx = 14
+combination_idx = 13
 
 pm = PathManager(basepath="current")
 

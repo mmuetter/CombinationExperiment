@@ -8,11 +8,10 @@ storex = worktable.incubator
 shelf = worktable.carrier["Shelf 8x4Pos"]
 
 tips_I = worktable.carrier["MCA96 3Pos"].define_labware(labwares["diti"], 1)
-tips_II = worktable.carrier["MCA96 3Pos"].define_labware(labwares["diti"], 2)
 
 
 mca = worktable.mca
-mca.tips = [tips_I, tips_II]
+mca.tips = [tips_I]
 tip_arr1 = np.array([False, True, True, True] + 4 * [False])
 tip_arr2 = np.array(4 * [False] + [True, True, True, False])
 tip_arr = tip_arr1 + tip_arr2

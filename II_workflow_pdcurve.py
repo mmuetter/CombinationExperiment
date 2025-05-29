@@ -41,19 +41,19 @@ class pdWorkflow:
         wl.add(
             roma.move_plate(
                 plate_A,
-                plate2_pos,
-                new_lid_gridsite=lid2_pos,
+                lid2_pos,
+                new_lid_gridsite=plate2_pos,
                 end_with_covered_plate=False,
             )
         )
 
-        for tip_idx, suffix in zip([1, 0], ["_II", "_I"]):
-            wl.add(mca.get_tips(tip_idx=tip_idx))
+        for _, suffix in zip([1, 0], ["_II", "_I"]):
+            wl.add(mca.get_tips())
             plate_B = self.combination["antibiotics" + suffix]
             wl.add(
                 roma.move_plate(
                     plate_B,
-                    plate1_pos,
+                    plate3_pos,
                     new_lid_gridsite=lid1_pos,
                     end_with_covered_plate=False,
                 )
@@ -188,7 +188,7 @@ class pdWorkflow:
         combination = self.combination
 
         # important: first handle _II then _I, as _II is lower concentrated.
-        for tip_idx, assayplate, antibioticplate in zip(
+        for _, assayplate, antibioticplate in zip(
             [1, 0],
             [combination["assay_II"], combination["assay_I"]],
             [combination["antibiotics_II"], combination["antibiotics_I"]],
@@ -216,7 +216,7 @@ class pdWorkflow:
                     end_with_covered_plate=False,
                 )
             )
-            wl.add(mca.get_tips(tip_idx=tip_idx))
+            wl.add(mca.get_tips())
             wl.add(
                 mca.fill_384plate(
                     antibioticplate,

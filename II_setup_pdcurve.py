@@ -27,7 +27,6 @@ class pdSetup:
         self.lumread = experiment.setup_measurement("lum_count_exp.xml", "lum_files")
         self.location = experiment.setup_location_file(folderkey="notes_II")
         self.location.add(mca.tips[0])
-        self.location.add(mca.tips[1])
 
         # Define Hardware
         self.combination = config.combinations[combination_idx]

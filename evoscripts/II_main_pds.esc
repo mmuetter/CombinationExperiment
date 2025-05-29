@@ -1,5 +1,5 @@
-61F5E042
-20250527_134825 Admin           
+2AA0E3FD
+20250528_144307 Admin           
                                                                                                                                 
 Admininstrator                                                                                                                  
 --{ RES }--
@@ -24,8 +24,8 @@ V;200
 998;0;
 998;0;
 998;0;
-998;3;iPT384;DiTi 200ul AXYGEN MCA96;DiTi 200ul AXYGEN MCA96;
-998;Pintool;tips;Labware18;
+998;3;iPT384;DiTi 200ul AXYGEN MCA96;;
+998;Pintool;tips I;;
 998;0;
 998;0;
 998;0;
@@ -34,7 +34,7 @@ V;200
 998;192;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 998;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 998;3;;;Trough 300ml MCA96;
-998;;;medium;
+998;;;LB medium;
 998;0;
 998;0;
 998;0;
@@ -48,8 +48,8 @@ V;200
 998;;;;
 998;3;Wash Station Cleaner shallow;Wash Station Waste;Wash Station Cleaner deep;
 998;;;;
-998;2;12Col Through;384 Well Plate Greiner;
-998;overnights 12col;lid2;
+998;2;12Col Through;96 Well Greiner SC;
+998;overnights 12col;subreservoir A;
 998;1;;
 998;;
 998;0;
@@ -58,7 +58,7 @@ V;200
 998;0;
 998;0;
 998;3;384 Well Plate Greiner;384 Well Plate Greiner;96 Well Greiner SC;
-998;assay;helper;Labware17;
+998;assay;helper;antibiotics B;
 998;0;
 998;0;
 998;0;

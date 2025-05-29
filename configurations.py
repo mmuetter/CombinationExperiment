@@ -37,7 +37,7 @@ class AssayConfiguration:
     # durations
     overnight_incubation_time: int = 14 * 60 * 60  # 14 hours
     exponential_growth_time: int = int(1 * 60 * 60)  # 1 hours
-    assay_duration_h: int = 3.1  # 5 hours
+    assay_duration_h: int = 4.1  # 5 hours
     approx_plate_read_duration: int = 5  # minutes
 
     # overnight plate (12 col)
