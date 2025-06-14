@@ -7,9 +7,8 @@ from general_classes import PathManager
 
 ## use pyenv 3.12.0
 folder = "twofold1to1"
-exp_name = "run_5"
+exp_name = "run_6"
 exp_path = "/Users/malte/polybox/Shared/Robot-Malte/CombinationProject/" + folder
-combination_idx = 13
 
 pm = PathManager(basepath="current")
 
@@ -21,15 +20,16 @@ experiment = Experiment(
     default_keys=["notes_II", "wl_II"],
 )
 
+
 config = AssayConfiguration()
-setup = pdSetup(config, experiment, combination_idx)
-
-workflow = pdWorkflow(setup)
-
-
-workflow.grow_overnight()
-workflow.prefill_assay_plates()
-workflow.prepare_exp_cultures()
-workflow.combine_plates()
-workflow.treat_cultures()
-workflow.luminescence_read_loop()
+for combination_idx in range(0, 15):
+    print(combination_idx)
+    setup = pdSetup(config, experiment, combination_idx)
+    workflow = pdWorkflow(setup)
+    workflow.dilute_second_overnight()
+    workflow.prefill_assay_plates()
+    workflow.fill_helper_plate()
+    workflow.infect_assays()
+    workflow.combine_plates()
+    workflow.treat_cultures()
+    workflow.luminescence_read_loop()

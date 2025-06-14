@@ -24,6 +24,7 @@ class pdSetup:
         experiment.clone_folder("notes_II")
         experiment.clone_folder("eval_code")
         experiment.clone_folder("lum_files")
+        self.combination_idx = combination_idx
         self.lumread = experiment.setup_measurement("lum_count_exp.xml", "lum_files")
         self.location = experiment.setup_location_file(folderkey="notes_II")
         self.location.add(mca.tips[0])
@@ -32,14 +33,15 @@ class pdSetup:
         self.combination = config.combinations[combination_idx]
 
         ## 384 well plate to distribute overnight cultures
-        self.helper_plate = storex.define_plate_next_free_site(
-            "helper_plate", greiner384
-        )
+        self.helper_plate = storex.define_plate("helper_plate", greiner384, 0, 0)
 
         self.antibiotic_plates = self.define_antibiotic_plates()
         self.assay_plates = self.define_assay_plate()
         self.medium = self.define_medium_trough()
         self.overnight_12col = self.define_overnight_plate()
+        self.next_overnight_12col = self.define_overnight_plate(
+            "next_overnight_strains", dw12col, position=1
+        )
         experiment.save_csv(
             self.storex_locations(), "storex_locations.csv", folder_key="notes_II"
         )
@@ -72,12 +74,12 @@ class pdSetup:
 
         # I
         label = f"{combination['a']}_{combination['b']}_I"
-        plate = storex.define_plate_next_free_site(label, greiner384)
+        plate = storex.define_plate(label, greiner384, 0, 1)
         combination.update({"assay_I": plate})
         assayplates.append(plate)
         # II
         label = f"{combination['a']}_{combination['b']}_II"
-        plate = storex.define_plate_next_free_site(label, greiner384)
+        plate = storex.define_plate(label, greiner384, 0, 2)
         combination.update({"assay_II": plate})
         assayplates.append(plate)
         return assayplates

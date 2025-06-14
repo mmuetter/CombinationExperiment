@@ -8,7 +8,7 @@ import pandas as pd
 
 ## use pyenv 3.12.0
 folder = "twofold1to1"
-exp_name = "run_5"
+exp_name = "test"
 exp_path = "/Users/malte/polybox/Shared/Robot-Malte/CombinationProject/" + folder
 
 experiment = Experiment(
@@ -57,6 +57,8 @@ workflow.mk_combination_plates_B()
 
 #######################################################
 # double check
+
+# Volumes
 asp_vol = {}
 disp_vol = {}
 
@@ -78,3 +80,24 @@ for col in range(1, 13):
 print("asp_vol", asp_vol)
 print("disp_vol", disp_vol)
 print("total_vol", total_vol)
+
+# Assign resulting concentrations
+conc_df = files.drugs_df[["drug"]]
+conc_df["c1"] = files.drugs_df.cmix
+conc_df.set_index("drug", inplace=True)
+for col in range(2, 13):
+    src = config.pi_feeding_cols[col]
+    transfer_vol = config.pi_transfer_volumes[col]
+    prefill_vol = config.pi_LB_fill_volumes[col]
+    if transfer_vol:
+        src_conc = conc_df[f"c{src}"]
+        dest_conc = src_conc * (transfer_vol / (transfer_vol + prefill_vol))
+        conc_df[f"c{col}"] = dest_conc
+    else:
+        conc_df[f"c{col}"] = 0
+
+display(conc_df)
+assay_conc_df = conc_df.copy()
+assay_conc_df = assay_conc_df / 20
+
+display(assay_conc_df)

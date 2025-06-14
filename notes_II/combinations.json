@@ -1,0 +1,122 @@
+{
+    "amoxicillin_chloramphenicol": {
+        "i": 0,
+        "j": 1,
+        "a": "amoxicillin",
+        "b": "chloramphenicol",
+        "name_I": "amoxicillin_chloramphenicol_I",
+        "name_II": "amoxicillin_chloramphenicol_II"
+    },
+    "amoxicillin_colistin": {
+        "i": 0,
+        "j": 2,
+        "a": "amoxicillin",
+        "b": "colistin",
+        "name_I": "amoxicillin_colistin_I",
+        "name_II": "amoxicillin_colistin_II"
+    },
+    "amoxicillin_fosfomycin": {
+        "i": 0,
+        "j": 3,
+        "a": "amoxicillin",
+        "b": "fosfomycin",
+        "name_I": "amoxicillin_fosfomycin_I",
+        "name_II": "amoxicillin_fosfomycin_II"
+    },
+    "amoxicillin_polymyxinB": {
+        "i": 0,
+        "j": 4,
+        "a": "amoxicillin",
+        "b": "polymyxinB",
+        "name_I": "amoxicillin_polymyxinB_I",
+        "name_II": "amoxicillin_polymyxinB_II"
+    },
+    "amoxicillin_tetracycline": {
+        "i": 0,
+        "j": 5,
+        "a": "amoxicillin",
+        "b": "tetracycline",
+        "name_I": "amoxicillin_tetracycline_I",
+        "name_II": "amoxicillin_tetracycline_II"
+    },
+    "chloramphenicol_colistin": {
+        "i": 1,
+        "j": 2,
+        "a": "chloramphenicol",
+        "b": "colistin",
+        "name_I": "chloramphenicol_colistin_I",
+        "name_II": "chloramphenicol_colistin_II"
+    },
+    "chloramphenicol_fosfomycin": {
+        "i": 1,
+        "j": 3,
+        "a": "chloramphenicol",
+        "b": "fosfomycin",
+        "name_I": "chloramphenicol_fosfomycin_I",
+        "name_II": "chloramphenicol_fosfomycin_II"
+    },
+    "chloramphenicol_polymyxinB": {
+        "i": 1,
+        "j": 4,
+        "a": "chloramphenicol",
+        "b": "polymyxinB",
+        "name_I": "chloramphenicol_polymyxinB_I",
+        "name_II": "chloramphenicol_polymyxinB_II"
+    },
+    "chloramphenicol_tetracycline": {
+        "i": 1,
+        "j": 5,
+        "a": "chloramphenicol",
+        "b": "tetracycline",
+        "name_I": "chloramphenicol_tetracycline_I",
+        "name_II": "chloramphenicol_tetracycline_II"
+    },
+    "colistin_fosfomycin": {
+        "i": 2,
+        "j": 3,
+        "a": "colistin",
+        "b": "fosfomycin",
+        "name_I": "colistin_fosfomycin_I",
+        "name_II": "colistin_fosfomycin_II"
+    },
+    "colistin_polymyxinB": {
+        "i": 2,
+        "j": 4,
+        "a": "colistin",
+        "b": "polymyxinB",
+        "name_I": "colistin_polymyxinB_I",
+        "name_II": "colistin_polymyxinB_II"
+    },
+    "colistin_tetracycline": {
+        "i": 2,
+        "j": 5,
+        "a": "colistin",
+        "b": "tetracycline",
+        "name_I": "colistin_tetracycline_I",
+        "name_II": "colistin_tetracycline_II"
+    },
+    "fosfomycin_polymyxinB": {
+        "i": 3,
+        "j": 4,
+        "a": "fosfomycin",
+        "b": "polymyxinB",
+        "name_I": "fosfomycin_polymyxinB_I",
+        "name_II": "fosfomycin_polymyxinB_II"
+    },
+    "fosfomycin_tetracycline": {
+        "i": 3,
+        "j": 5,
+        "a": "fosfomycin",
+        "b": "tetracycline",
+        "name_I": "fosfomycin_tetracycline_I",
+        "name_II": "fosfomycin_tetracycline_II"
+    },
+    "polymyxinB_tetracycline": {
+        "i": 4,
+        "j": 5,
+        "a": "polymyxinB",
+        "b": "tetracycline",
+        "name_I": "polymyxinB_tetracycline_I",
+        "name_II": "polymyxinB_tetracycline_II"
+    }
+}

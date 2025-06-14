@@ -7,6 +7,7 @@ from worktable import (
     plate3_pos,
     lid1_pos,
     lid2_pos,
+    shaker_pos,
 )
 from dataclasses import dataclass
 import numpy as np
@@ -21,7 +22,10 @@ class pdWorkflow:
         self.setup = setup
         self.combination = setup.combination
         self.config = setup.config
-        self.protocol = experiment.setup_protocol(folder_key="notes_II")
+        self.protocol = experiment.setup_protocol(
+            file_name=f"timelog_c{setup.combination_idx}.csv", folder_key="notes_II"
+        )
+        self.combination_idx = setup.combination_idx
         self.tip_arr = [False] + 6 * [True] + [False]
         self.tip_arr8 = 8 * [True]
         self.column_mask96_8 = 8 * [True]
@@ -29,13 +33,8 @@ class pdWorkflow:
         self.column_mask384_A = np.array(2 * [False] + 6 * [True, False] + 2 * [False])
         self.column_mask384_B = np.array(2 * [False] + 6 * [False, True] + 2 * [False])
 
-    def grow_overnight(self, wl_name="grow_overnight.gwl"):
-        wl = self.setup_worklist(wl_name)
-        wl.add(start_timer(1))
-        wl.add(wait_timer(1, self.config.overnight_incubation_time))
-
     def combine_plates(self):
-        wl = self.setup_worklist("combine_plates.gwl")
+        wl = self.setup_worklist(f"c{self.combination_idx}_combine_plates.gwl")
         plate_A = self.setup.subreservoir_A
 
         wl.add(
@@ -64,7 +63,7 @@ class pdWorkflow:
                     1,
                     1,
                     self.config.drug_plate_vol / 2,
-                    liquid_class="LB FD MCA",
+                    liquid_class="Water free dispense",
                 )
             )
             wl.add(
@@ -73,16 +72,17 @@ class pdWorkflow:
                     1,
                     1,
                     self.config.drug_plate_vol / 2,
-                    liquid_class="LB FD MCA",
+                    liquid_class="Water free dispense",
                 ),
-                msg="combine_" + plate_B.name,
+                msg="antibiotic_plates_combined",
             )
             wl.add(roma.store(plate_B))
             wl.add(mca.return_tips())
 
         wl.add(roma.store(plate_A))
 
-    def _fill_helper_plate(self, wl):
+    def fill_helper_plate(self):
+        wl = self.setup_worklist(f"c{self.combination_idx}_fill_helper_plate.gwl")
         wl.add(liha.sterile_wash())
         wl.add(
             roma.move_plate(
@@ -112,10 +112,20 @@ class pdWorkflow:
             else:
                 start_col = 2
             wl.add(
+                liha.mix(
+                    self.setup.overnight_12col,
+                    self.config.overnight_culture_cols[replicate],
+                    250,
+                    2,
+                    self.tip_arr8,
+                    tip_array=self.tip_arr8,
+                )
+            )
+            wl.add(
                 liha.fill_plate(
                     self.setup.overnight_12col,
                     self.setup.helper_plate,
-                    self.config.assay_total_vol,
+                    40,
                     self.column_mask96,
                     column_mask,
                     liquid_class="LB FD ZMAX",
@@ -131,9 +141,10 @@ class pdWorkflow:
         wl.add(
             roma.incubate(self.setup.overnight_12col), msg="filling_helper_plate_done"
         )
+        wl.add(roma.incubate(self.setup.helper_plate))
 
     def prefill_assay_plates(self):
-        wl = self.setup_worklist("prefill_assay.gwl")
+        wl = self.setup_worklist(f"c{self.combination_idx}_prefill_assay.gwl")
         for assay_plate in self.setup.assay_plates:
             wl.add(
                 roma.move_plate(
@@ -150,21 +161,26 @@ class pdWorkflow:
                     assay_plate,
                     self.config.assay_total_vol * 0.9,
                     get_tips=True,
-                    liquid_class="LB FD MCA",
+                    liquid_class="Water free dispense",
                 )
             )
             wl.add(
                 roma.incubate(assay_plate),
-                msg=f"{assay_plate.name}_filled",
+                msg=f"assay_plate_filled",
             )
 
-    def prepare_exp_cultures(self):
-        wl = self.setup_worklist("prepare_exponential_cultures.gwl")
-        # Distribute overnight cultures to helper plate
-        self._fill_helper_plate(wl)
-        # Infect assay plates using pintool
+    def infect_assays(self):
+        wl = self.setup_worklist(f"c{self.combination_idx}_infect_assays.gwl")
         wl.add(mca.get_pintool())
         wl.add(mca.clean_pintool())
+        wl.add(
+            roma.move_plate(
+                self.setup.helper_plate,
+                plate2_pos,
+                new_lid_gridsite=lid2_pos,
+                end_with_covered_plate=False,
+            )
+        )
         for assay_plate in self.setup.assay_plates:
             wl.add(
                 roma.move_plate(
@@ -183,13 +199,12 @@ class pdWorkflow:
         wl.add(roma.incubate(self.setup.helper_plate))
 
     def treat_cultures(self):
-        wl = self.setup_worklist("treat_strains.gwl")
+        wl = self.setup_worklist(f"c{self.combination_idx}_treat_strains.gwl")
         wl.add(wait_timer(2, self.config.exponential_growth_time))
         combination = self.combination
 
         # important: first handle _II then _I, as _II is lower concentrated.
-        for _, assayplate, antibioticplate in zip(
-            [1, 0],
+        for assayplate, antibioticplate in zip(
             [combination["assay_II"], combination["assay_I"]],
             [combination["antibiotics_II"], combination["antibiotics_I"]],
         ):
@@ -217,16 +232,18 @@ class pdWorkflow:
                 )
             )
             wl.add(mca.get_tips())
-            wl.add(
-                mca.fill_384plate(
-                    antibioticplate,
-                    assayplate,
-                    self.config.assay_total_vol * 0.1,
-                    get_tips=False,
-                    liquid_class="LB CD ZMAX",
-                ),
-                msg="treat_" + assayplate.name,
-            )
+            for row, col in product([1, 2], [1, 2]):
+                wl.add(
+                    mca.fill_rep(
+                        antibioticplate,
+                        assayplate,
+                        self.config.assay_total_vol * 0.1,
+                        liquid_class="Water free dispense",
+                        row=row,
+                        col=col,
+                    ),
+                    msg=f"treat_r{row}_c{col}",
+                )
             wl.add(mca.return_tips())
             wl.add(
                 roma.instert_plate_to_reader(
@@ -251,7 +268,7 @@ class pdWorkflow:
         counter_dict = dict(zip(assay_plate_names, [1] * len(assay_plate_names)))
 
         for i in range(n_loops):
-            wl = self.setup_worklist("loop_" + str(i + 1) + ".gwl")
+            wl = self.setup_worklist(f"c{self.combination_idx}_loop_{str(i + 1)}.gwl")
             for assayplate in self.setup.assay_plates:
                 wl.add(
                     roma.instert_plate_to_reader(
@@ -270,6 +287,61 @@ class pdWorkflow:
                 )
                 counter_dict[assayplate.name] += 1
                 wl.add(roma.incubate(assayplate))
+
+    def dilute_second_overnight(self):
+        # BUYS APPROX 5 HOURS TIME
+        wl = self.setup_worklist(f"c{self.combination_idx}_dilute_second_overnight.gwl")
+        wl.add(
+            roma.move_plate(
+                self.setup.next_overnight_12col,
+                shaker_pos,
+                new_lid_gridsite=plate3_pos,
+                end_with_covered_plate=False,
+            ),
+            msg="prefill_lb_in_next_overnight_plate",
+        )
+        wl.add(liha.sterile_wash())
+
+        wl.add(
+            roma.move_plate(
+                self.setup.overnight_12col,
+                lid1_pos,
+                new_lid_gridsite=plate1_pos,
+                end_with_covered_plate=False,
+            )
+        )
+        for i, col in enumerate(self.config.overnight_culture_cols):
+            tip_arr = 8 * [False]
+            tip_arr[i + 1] = True
+            wl.add(
+                liha.mix(
+                    self.setup.overnight_12col,
+                    col,
+                    250,
+                    2,
+                    self.tip_arr8,
+                    tip_array=self.tip_arr8,
+                ),
+            )
+            wl.add(
+                liha.vol_transfer(
+                    self.setup.overnight_12col,
+                    col,
+                    self.setup.next_overnight_12col,
+                    col,
+                    self.config.next_on_transfer_vol,
+                    tip_array=tip_arr,
+                    column_mask=tip_arr,
+                ),
+                msg=f"transfering_strain_col{col}_to_next_overnight_plate",
+            )
+
+        wl.add(liha.sterile_wash())
+        wl.add(roma.incubate(self.setup.next_overnight_12col))
+        wl.add(
+            roma.incubate(self.setup.overnight_12col),
+            msg="dilute_second_overnight_done",
+        )
 
     def setup_worklist(self, name):
         return self.experiment.setup_worklist(

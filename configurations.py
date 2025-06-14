@@ -35,8 +35,9 @@ class AssayConfiguration:
     assay_total_vol: int = 60
 
     # durations
-    overnight_incubation_time: int = 14 * 60 * 60  # 14 hours
-    exponential_growth_time: int = int(1 * 60 * 60)  # 1 hours
+    # use 10ml for each rep
+    overnight_incubation_time: int = 12 * 60 * 60  # 14 hours
+    exponential_growth_time: int = int(2 * 60 * 60)  # 2 hours
     assay_duration_h: int = 4.1  # 5 hours
     approx_plate_read_duration: int = 5  # minutes
 
@@ -44,6 +45,10 @@ class AssayConfiguration:
     strain_reservoir_well_volume: int = 10000
     overnight_culture_cols: List[int] = field(init=False)
     combinations: Dict[Tuple[str, str], Dict[str, Optional[float]]] = field(init=False)
+
+    # next overnight plate (12 col)
+    next_on_vol = 5000
+    next_on_transfer_vol = 5
 
     def __post_init__(self):
         object.__setattr__(
