@@ -33,3 +33,24 @@ for combination_idx in range(0, 15):
     workflow.combine_plates()
     workflow.treat_cultures()
     workflow.luminescence_read_loop()
+
+
+self = workflow
+wl = self.setup_worklist(f"test_mca.gwl")
+wl.add(mca.get_pintool())
+roma.move_plate(
+    self.setup.helper_plate,
+    plate2_pos,
+    new_lid_gridsite=lid2_pos,
+    end_with_covered_plate=False,
+)
+assay_plate = self.setup.assay_plates[0]
+roma.move_plate(
+    assay_plate,
+    plate1_pos,
+    new_lid_gridsite=lid1_pos,
+    end_with_covered_plate=False,
+)
+wl.add(mca.replicate_with_pintool(self.setup.helper_plate, assay_plate, dip_offset=10))
+wl.add(mca.move(self.setup.helper_plate))
+wl.add(mca.drop_pintool())

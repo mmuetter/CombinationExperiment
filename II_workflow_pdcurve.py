@@ -173,6 +173,8 @@ class pdWorkflow:
         wl = self.setup_worklist(f"c{self.combination_idx}_infect_assays.gwl")
         wl.add(mca.get_pintool())
         wl.add(mca.clean_pintool())
+        wl.add(mca.drop_pintool())
+        wl.add(mca.get_pintool())
         wl.add(
             roma.move_plate(
                 self.setup.helper_plate,
@@ -190,7 +192,11 @@ class pdWorkflow:
                     end_with_covered_plate=False,
                 )
             )
-            wl.add(mca.replicate_with_pintool(self.setup.helper_plate, assay_plate))
+            wl.add(
+                mca.replicate_with_pintool(
+                    self.setup.helper_plate, assay_plate, dip_offset=10
+                )
+            )
             wl.add(mca.move(self.setup.helper_plate))
             wl.add(roma.incubate(assay_plate))
         wl.add(start_timer(2))
