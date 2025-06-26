@@ -39,9 +39,7 @@ class pdSetup:
         self.assay_plates = self.define_assay_plate()
         self.medium = self.define_medium_trough()
         self.overnight_12col = self.define_overnight_plate()
-        self.next_overnight_12col = self.define_overnight_plate(
-            "next_overnight_strains", dw12col, position=1
-        )
+        self.next_day_helper = storex.define_plate("helper_plate", greiner384, 1, 0)
         experiment.save_csv(
             self.storex_locations(), "storex_locations.csv", folder_key="notes_II"
         )

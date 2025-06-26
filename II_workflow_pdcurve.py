@@ -116,7 +116,7 @@ class pdWorkflow:
                     self.setup.overnight_12col,
                     self.config.overnight_culture_cols[replicate],
                     250,
-                    2,
+                    4,
                     self.tip_arr8,
                     tip_array=self.tip_arr8,
                 )
@@ -125,7 +125,7 @@ class pdWorkflow:
                 liha.fill_plate(
                     self.setup.overnight_12col,
                     self.setup.helper_plate,
-                    40,
+                    50,
                     self.column_mask96,
                     column_mask,
                     liquid_class="LB FD ZMAX",
@@ -169,6 +169,34 @@ class pdWorkflow:
                 msg=f"assay_plate_filled",
             )
 
+    def fill_384well_plate_with_LB(self, plate, volume, wl, move_plate=True):
+        """
+        Fills a 384 well plate with LB medium.
+        If move_plate is True, the plate will be moved to the lid2 position.
+        """
+        if move_plate:
+            wl.add(
+                roma.move_plate(
+                    plate,
+                    plate2_pos,
+                    new_lid_gridsite=lid2_pos,
+                    end_with_covered_plate=False,
+                )
+            )
+        wl.add(
+            mca.fill_384plate(
+                self.setup.medium,
+                plate,
+                volume,
+                get_tips=True,
+                liquid_class="Water free dispense",
+            )
+        )
+        if move_plate:
+            wl.add(
+                roma.incubate(plate),
+            )
+
     def infect_assays(self):
         wl = self.setup_worklist(f"c{self.combination_idx}_infect_assays.gwl")
         wl.add(mca.get_pintool())
@@ -202,6 +230,14 @@ class pdWorkflow:
         wl.add(start_timer(2))
         wl.add(mca.clean_pintool())
         wl.add(mca.drop_pintool())
+
+        wl.add(
+            roma.instert_plate_to_reader(
+                self.setup.helper_plate,
+                end_with_covered_plate=False,
+            )
+        )
+        wl.add(self.setup.lumread.measure(f"c{self.setup.combination_idx}_helper.xml"))
         wl.add(roma.incubate(self.setup.helper_plate))
 
     def treat_cultures(self):
@@ -210,9 +246,10 @@ class pdWorkflow:
         combination = self.combination
 
         # important: first handle _II then _I, as _II is lower concentrated.
-        for assayplate, antibioticplate in zip(
+        for assayplate, antibioticplate, suffix in zip(
             [combination["assay_II"], combination["assay_I"]],
             [combination["antibiotics_II"], combination["antibiotics_I"]],
+            ["_II", "_I"],
         ):
             wl.add(
                 roma.instert_plate_to_reader(
@@ -248,7 +285,7 @@ class pdWorkflow:
                         row=row,
                         col=col,
                     ),
-                    msg=f"treat_r{row}_c{col}",
+                    msg=f"treat_r{row}_c{col}{suffix}",
                 )
             wl.add(mca.return_tips())
             wl.add(
@@ -294,60 +331,39 @@ class pdWorkflow:
                 counter_dict[assayplate.name] += 1
                 wl.add(roma.incubate(assayplate))
 
-    def dilute_second_overnight(self):
-        # BUYS APPROX 5 HOURS TIME
-        wl = self.setup_worklist(f"c{self.combination_idx}_dilute_second_overnight.gwl")
+    def mk_next_day_helper(self):
+        wl = self.setup_worklist(f"c{self.combination_idx}_mk_next_day_helper.gwl")
         wl.add(
             roma.move_plate(
-                self.setup.next_overnight_12col,
-                shaker_pos,
-                new_lid_gridsite=plate3_pos,
-                end_with_covered_plate=False,
-            ),
-            msg="prefill_lb_in_next_overnight_plate",
-        )
-        wl.add(liha.sterile_wash())
-
-        wl.add(
-            roma.move_plate(
-                self.setup.overnight_12col,
-                lid1_pos,
-                new_lid_gridsite=plate1_pos,
+                self.setup.next_day_helper,
+                plate1_pos,
+                new_lid_gridsite=lid1_pos,
                 end_with_covered_plate=False,
             )
         )
-        for i, col in enumerate(self.config.overnight_culture_cols):
-            tip_arr = 8 * [False]
-            tip_arr[i + 1] = True
-            wl.add(
-                liha.mix(
-                    self.setup.overnight_12col,
-                    col,
-                    250,
-                    2,
-                    self.tip_arr8,
-                    tip_array=self.tip_arr8,
-                ),
-            )
-            wl.add(
-                liha.vol_transfer(
-                    self.setup.overnight_12col,
-                    col,
-                    self.setup.next_overnight_12col,
-                    col,
-                    self.config.next_on_transfer_vol,
-                    tip_array=tip_arr,
-                    column_mask=tip_arr,
-                ),
-                msg=f"transfering_strain_col{col}_to_next_overnight_plate",
-            )
-
-        wl.add(liha.sterile_wash())
-        wl.add(roma.incubate(self.setup.next_overnight_12col))
-        wl.add(
-            roma.incubate(self.setup.overnight_12col),
-            msg="dilute_second_overnight_done",
+        self.fill_384well_plate_with_LB(
+            self.setup.next_day_helper, 50, wl, move_plate=False
         )
+        wl.add(mca.get_pintool())
+        wl.add(mca.clean_pintool())
+        wl.add(
+            roma.move_plate(
+                self.setup.assay_plates[0],
+                plate2_pos,
+                new_lid_gridsite=lid2_pos,
+                end_with_covered_plate=False,
+            )
+        )
+        wl.add(
+            mca.replicate_with_pintool(
+                self.setup.assay_plates[0], self.setup.next_day_helper, dip_offset=10
+            )
+        )
+        wl.add(mca.move(self.setup.next_day_helper))
+        wl.add(roma.incubate(self.setup.assay_plates[0]))
+        wl.add(roma.incubate(self.setup.next_day_helper))
+        wl.add(mca.clean_pintool())
+        wl.add(mca.drop_pintool())
 
     def setup_worklist(self, name):
         return self.experiment.setup_worklist(

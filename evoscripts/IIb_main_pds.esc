@@ -1,5 +1,5 @@
-EC74DD60
-20250614_172613 Admin           
+BE9F606D
+20250626_112957 Admin           
                                                                                                                                 
 Admininstrator                                                                                                                  
 --{ RES }--
@@ -162,19 +162,18 @@ V;200
 998;65;
 996;0;0;
 --{ RPG }--
-Variable(exp_name,"run_6",0,"",0,1.000000,10.000000,1,2,0,0);
+Variable(exp_name,"run_7",0,"",0,1.000000,10.000000,1,2,0,0);
 Variable(base_path,"C:\Users\COMPUTER\polybox\Robot-Malte\CombinationProject\twofold1to1\~exp_name~\",0,"",0,1.000000,10.000000,1,2,0,0);
 Variable(wl_path,"~base_path~worklists_II\",0,"",0,1.000000,10.000000,1,2,0,0);
 Variable(evo_path,"~base_path~evoscripts\",0,"",0,1.000000,10.000000,1,2,0,0);
 Variable(incubation_time_h,"12",0,"",0,1.000000,10.000000,0,2,0,0);
+Variable(helper_timer,"5",0,"",0,1.000000,10.000000,0,2,0,0);
 Variable(combination_idx,"0",1,"pls set the combination_idx",1,0.000000,14.000000,0,2,1,0);
 UserPrompt("wl path correct?~wl_path~",0,-1);
 StartTimer("1");
 Group("mk_helper_plate");
-WaitTimer("1","(incubation_time_h-2)*3600");
+WaitTimer("1","helper_timer*3600");
 Wash(255,31,1,31,0,"30.0",500,"40.0",500,10,70,30,1,0,1000,0);
-Worklist(0,~wl_path~c~combination_idx~_dilute_second_overnight.gwl,255,"Water free dispense",0,1);Wash(255,31,1,31,0,"3.0",500,"4.0",500,10,70,30,1,0,1000,0);GetDITI2(0,"DiTi 200ul LiHa",0,0,10,70);DropDITI(0,-1,0,10,70,0);
-Worklist(1,,0,"",0,1);Wash(255,31,1,31,0,"3.0",500,"4.0",500,10,70,30,1,0,1000,0);GetDITI2(0,"DiTi 200ul LiHa",0,0,10,70);DropDITI(0,-1,0,10,70,0);
 Worklist(0,~wl_path~c~combination_idx~_fill_helper_plate.gwl,255,"Water free dispense",0,1);Wash(255,31,1,31,0,"3.0",500,"4.0",500,10,70,30,1,0,1000,0);GetDITI2(0,"DiTi 200ul LiHa",0,0,10,70);DropDITI(0,-1,0,10,70,0);
 Worklist(1,,0,"",0,1);Wash(255,31,1,31,0,"3.0",500,"4.0",500,10,70,30,1,0,1000,0);GetDITI2(0,"DiTi 200ul LiHa",0,0,10,70);DropDITI(0,-1,0,10,70,0);
 GroupEnd();
@@ -188,9 +187,11 @@ GroupEnd();
 WaitTimer("1","incubation_time_h*3600");
 Worklist(0,~wl_path~c~combination_idx~_infect_assays.gwl,255,"Water free dispense",0,1);Wash(255,31,1,31,0,"3.0",500,"4.0",500,10,70,30,1,0,1000,0);GetDITI2(0,"DiTi 200ul LiHa",0,0,10,70);DropDITI(0,-1,0,10,70,0);
 Worklist(1,,0,"",0,1);Wash(255,31,1,31,0,"3.0",500,"4.0",500,10,70,30,1,0,1000,0);GetDITI2(0,"DiTi 200ul LiHa",0,0,10,70);DropDITI(0,-1,0,10,70,0);
+Worklist(0,~wl_path~c~combination_idx~_mk_next_day_helper.gwl,255,"Water free dispense",0,1);Wash(255,31,1,31,0,"3.0",500,"4.0",500,10,70,30,1,0,1000,0);GetDITI2(0,"DiTi 200ul LiHa",0,0,10,70);DropDITI(0,-1,0,10,70,0);
+Worklist(1,,0,"",0,1);Wash(255,31,1,31,0,"3.0",500,"4.0",500,10,70,30,1,0,1000,0);GetDITI2(0,"DiTi 200ul LiHa",0,0,10,70);DropDITI(0,-1,0,10,70,0);
 Worklist(0,~wl_path~c~combination_idx~_treat_strains.gwl,255,"Water free dispense",0,1);Wash(255,31,1,31,0,"3.0",500,"4.0",500,10,70,30,1,0,1000,0);GetDITI2(0,"DiTi 200ul LiHa",0,0,10,70);DropDITI(0,-1,0,10,70,0);
 Worklist(1,,0,"",0,1);Wash(255,31,1,31,0,"3.0",500,"4.0",500,10,70,30,1,0,1000,0);GetDITI2(0,"DiTi 200ul LiHa",0,0,10,70);DropDITI(0,-1,0,10,70,0);
-BeginLoop("25","i");
+BeginLoop("30","i");
 Worklist(0,~wl_path~c~combination_idx~_loop_~LOOP_i~.gwl,255,"Water free dispense",0,1);Wash(255,31,1,31,0,"3.0",500,"4.0",500,10,70,30,1,0,1000,0);GetDITI2(0,"DiTi 200ul LiHa",0,0,10,70);DropDITI(0,-1,0,10,70,0);
 Worklist(1,,0,"",0,1);Wash(255,31,1,31,0,"3.0",500,"4.0",500,10,70,30,1,0,1000,0);GetDITI2(0,"DiTi 200ul LiHa",0,0,10,70);DropDITI(0,-1,0,10,70,0);
 EndLoop();
