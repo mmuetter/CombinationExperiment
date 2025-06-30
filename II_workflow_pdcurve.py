@@ -211,7 +211,8 @@ class pdWorkflow:
                 end_with_covered_plate=False,
             )
         )
-        for assay_plate in self.setup.assay_plates:
+        for assay_plate in [self.setup.assay_plates[0], self.setup.assay_plates[1]]:
+            start_timer(3)
             wl.add(
                 roma.move_plate(
                     assay_plate,
@@ -223,10 +224,12 @@ class pdWorkflow:
             wl.add(
                 mca.replicate_with_pintool(
                     self.setup.helper_plate, assay_plate, dip_offset=10
-                )
+                ),
+                msg=f"infect_assay_{assay_plate.name}",
             )
             wl.add(mca.move(self.setup.helper_plate))
             wl.add(roma.incubate(assay_plate))
+            wait_timer(3, self.config.treatment_delay_minutes * 60)
         wl.add(start_timer(2))
         wl.add(mca.clean_pintool())
         wl.add(mca.drop_pintool())

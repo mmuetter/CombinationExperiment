@@ -33,11 +33,12 @@ class AssayConfiguration:
 
     # assayplate
     assay_total_vol: int = 60
+    treatment_delay_minutes = 11  # minutes
 
     # durations
     # use 10ml for each rep
     overnight_incubation_time: int = 12 * 60 * 60  # 14 hours
-    exponential_growth_time: int = int(2 * 60 * 60)  # 2 hours
+    exponential_growth_time: int = int(2.5 * 60 * 60)  # 2 hours
     assay_duration_h: int = 5  # 5 hours
     approx_plate_read_duration: int = 5  # minutes
 

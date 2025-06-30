@@ -21,6 +21,12 @@ experiment = Experiment(
 )
 
 
+## ATTENTION: This scripts contains exp-inc duration of 2.5 hours. Double check if you really want that.
+# user prompt:
+input(
+    "This script contains an incubation time of 2.5 hours. Do you want to continue? (y/n): "
+)
+
 config = AssayConfiguration()
 for combination_idx in range(0, 15):
     print(combination_idx)
@@ -29,10 +35,7 @@ for combination_idx in range(0, 15):
     workflow.prefill_assay_plates()
     workflow.fill_helper_plate()
     workflow.infect_assays()
-
-    # TEST AND REWRITE b and c Evoscripts
     workflow.mk_next_day_helper()
-
     workflow.combine_plates()
     workflow.treat_cultures()
     workflow.luminescence_read_loop()
